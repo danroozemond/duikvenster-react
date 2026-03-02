@@ -1,7 +1,7 @@
 export const STROMINGSDATA_STORAGE_KEY = 'duikvenster.stromingsdata.latest'
 
 export const STROMINGSDATA_URL_TEMPLATE =
-  'https://example.com/stromingsdata?siteId={siteId}&dateFrom={dateFrom}&dateTo={dateTo}'
+  'https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG_SOF_6.1.ms&sourceName=compute&&locationCode={siteId}&&startTime={dateTimeFrom}&endTime={dateTimeTo}'
 
 type DateInput = Date | string
 
@@ -14,6 +14,16 @@ function formatDate(date: Date): string {
   const month = padNumber(date.getMonth() + 1)
   const day = padNumber(date.getDate())
   return `${year}-${month}-${day}`
+}
+
+function formatUtcDateTime(date: Date): string {
+  const year = date.getUTCFullYear()
+  const month = padNumber(date.getUTCMonth() + 1)
+  const day = padNumber(date.getUTCDate())
+  const hour = padNumber(date.getUTCHours())
+  const minute = padNumber(date.getUTCMinutes())
+  const second = padNumber(date.getUTCSeconds())
+  return `${year}-${month}-${day}T${hour}:${minute}:${second}Z`
 }
 
 function resolveDateInput(input: DateInput | undefined, fallback: string): string {
@@ -38,6 +48,19 @@ function resolveDateInput(input: DateInput | undefined, fallback: string): strin
   return formatDate(parsedDate)
 }
 
+function parseLocalDate(value: string): { year: number; month: number; day: number } {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+  if (!match) {
+    throw new Error(`Invalid local date format: "${value}"`)
+  }
+
+  return {
+    year: Number(match[1]),
+    month: Number(match[2]),
+    day: Number(match[3]),
+  }
+}
+
 export function getDefaultDateFrom(baseDate: Date = new Date()): string {
   const yesterday = new Date(baseDate)
   yesterday.setDate(yesterday.getDate() - 1)
@@ -50,15 +73,34 @@ export function getDefaultDateTo(baseDate: Date = new Date()): string {
   return formatDate(dayAfterTomorrow)
 }
 
+export function toUtcDateTimeFromLocalDate(
+  localDate: string,
+  boundary: 'start' | 'end',
+): string {
+  const { year, month, day } = parseLocalDate(localDate)
+  const hour = boundary === 'start' ? 0 : 23
+  const minute = boundary === 'start' ? 0 : 59
+  const second = boundary === 'start' ? 0 : 59
+
+  // Convert local wall-clock time to UTC using browser timezone offset.
+  const localDateTime = new Date(year, month - 1, day, hour, minute, second)
+  const offsetMinutes = localDateTime.getTimezoneOffset()
+  const utcMs =
+    Date.UTC(year, month - 1, day, hour, minute, second) +
+    offsetMinutes * 60_000
+
+  return formatUtcDateTime(new Date(utcMs))
+}
+
 export function buildStromingsdataUrl(
   siteId: string,
-  dateFrom: string,
-  dateTo: string,
+  dateTimeFrom: string,
+  dateTimeTo: string,
 ): string {
   return STROMINGSDATA_URL_TEMPLATE
     .replace('{siteId}', encodeURIComponent(siteId))
-    .replace('{dateFrom}', encodeURIComponent(dateFrom))
-    .replace('{dateTo}', encodeURIComponent(dateTo))
+    .replace('{dateTimeFrom}', encodeURIComponent(dateTimeFrom))
+    .replace('{dateTimeTo}', encodeURIComponent(dateTimeTo))
 }
 
 export async function fetchStromingsdata(
@@ -72,13 +114,25 @@ export async function fetchStromingsdata(
 
   const normalizedDateFrom = resolveDateInput(dateFrom, getDefaultDateFrom())
   const normalizedDateTo = resolveDateInput(dateTo, getDefaultDateTo())
+  const normalizedDateTimeFrom = toUtcDateTimeFromLocalDate(
+    normalizedDateFrom,
+    'start',
+  )
+  const normalizedDateTimeTo = toUtcDateTimeFromLocalDate(
+    normalizedDateTo,
+    'end',
+  )
 
-  const url = buildStromingsdataUrl(siteId, normalizedDateFrom, normalizedDateTo)
+  const url = buildStromingsdataUrl(
+    siteId,
+    normalizedDateTimeFrom,
+    normalizedDateTimeTo,
+  )
   const response = await fetch(url)
 
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch stromingsdata for "${siteId}" (${normalizedDateFrom} to ${normalizedDateTo}): HTTP ${response.status}`,
+      `Failed to fetch stromingsdata for "${siteId}" (${normalizedDateTimeFrom} to ${normalizedDateTimeTo}): HTTP ${response.status}`,
     )
   }
 
@@ -87,8 +141,8 @@ export async function fetchStromingsdata(
     STROMINGSDATA_STORAGE_KEY,
     JSON.stringify({
       siteId,
-      dateFrom: normalizedDateFrom,
-      dateTo: normalizedDateTo,
+      dateTimeFrom: normalizedDateTimeFrom,
+      dateTimeTo: normalizedDateTimeTo,
       payload,
     }),
   )
