@@ -44,14 +44,20 @@ body {
 
 .app-navbar-container {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-height: 82px;
 }
 
 .app-navbar-brand {
+  position: absolute;
+  left: var(--bs-gutter-x);
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--ink-900);
+  margin-right: 0;
 }
 
 .app-navbar-brand:hover,
@@ -59,34 +65,14 @@ body {
   color: var(--ink-900);
 }
 
-.app-navbar .navbar-toggler {
-  border: none;
-  background: var(--surface-strong);
-  box-shadow: 0 6px 18px rgba(17, 44, 79, 0.12);
-}
-
-.app-navbar .navbar-toggler:focus {
-  box-shadow: 0 0 0 0.2rem var(--ring);
-}
-
-.app-navbar-collapse {
-  justify-content: center;
-}
-
 .site-selector-shell {
+  display: flex;
   width: min(100%, 540px);
-  padding: 0.6rem 0 0.4rem;
-}
-
-.site-selector-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-500);
+  padding: 0.4rem 0;
 }
 
 .site-selector {
+  width: 100%;
   height: 54px;
   border: 1px solid rgba(15, 111, 216, 0.2);
   border-radius: 14px;
@@ -184,26 +170,35 @@ body {
 }
 
 @media (min-width: 992px) {
-  .app-navbar-collapse {
-    position: absolute;
-    left: 50%;
-    width: min(560px, calc(100% - 260px));
-    transform: translateX(-50%);
+  .app-navbar-container {
+    justify-content: flex-start;
   }
 
   .site-selector-shell {
-    padding: 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(620px, calc(100% - (var(--bs-gutter-x) * 2)));
+    padding: 0.2rem 0;
   }
 }
 
 @media (max-width: 991.98px) {
   .app-navbar-container {
+    display: block;
     padding-top: 0.4rem;
     padding-bottom: 0.4rem;
   }
 
-  .app-navbar-collapse {
-    margin-top: 0.35rem;
+  .app-navbar-brand {
+    position: static;
+    display: inline-block;
+    margin-bottom: 0.35rem;
+  }
+
+  .site-selector-shell {
+    width: 100%;
+    padding: 0.2rem 0 0.4rem;
   }
 
   .chart-card-header {
