@@ -2,6 +2,7 @@ import Container from 'react-bootstrap/Container'
 import { useEffect, useState } from 'react'
 import AppNavbar from '../components/AppNavbar'
 import diveSites from '../data/diveSites.json'
+import { fetchStromingsdata } from '../utils/stromingsdata'
 
 const SELECTED_SITE_STORAGE_KEY = 'duikvenster.selectedDiveSiteId'
 
@@ -19,6 +20,9 @@ function HomePage() {
 
     return ''
   })
+  const [stromingsdata, setStromingsdata] = useState<unknown>(null)
+  const [isLoadingStromingsdata, setIsLoadingStromingsdata] = useState(false)
+  const [stromingsdataError, setStromingsdataError] = useState<string | null>(null)
 
   useEffect(() => {
     if (selectedSiteId === '') {
@@ -27,6 +31,46 @@ function HomePage() {
     }
 
     window.localStorage.setItem(SELECTED_SITE_STORAGE_KEY, selectedSiteId)
+  }, [selectedSiteId])
+
+  useEffect(() => {
+    if (selectedSiteId === '') {
+      setStromingsdata(null)
+      setStromingsdataError(null)
+      setIsLoadingStromingsdata(false)
+      return
+    }
+
+    let isCancelled = false
+
+    async function refreshStromingsdata() {
+      setIsLoadingStromingsdata(true)
+      setStromingsdataError(null)
+
+      try {
+        const result = await fetchStromingsdata(selectedSiteId)
+        if (!isCancelled) {
+          setStromingsdata(result)
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          setStromingsdata(null)
+          setStromingsdataError(
+            error instanceof Error ? error.message : 'Onbekende fout bij ophalen data.',
+          )
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoadingStromingsdata(false)
+        }
+      }
+    }
+
+    void refreshStromingsdata()
+
+    return () => {
+      isCancelled = true
+    }
   }, [selectedSiteId])
 
   const selectedSiteName =
@@ -48,10 +92,26 @@ function HomePage() {
             </span>
           </div>
           <div className="chart-placeholder mt-3">
-            <p className="mb-0">
-              Hier komt de chart voor{' '}
-              <strong>{selectedSiteName || 'de gekozen duikstek'}</strong>.
-            </p>
+            {selectedSiteId === '' ? (
+              <p className="mb-0">
+                Kies eerst een stek om stromingsdata op te halen.
+              </p>
+            ) : null}
+            {selectedSiteId !== '' && isLoadingStromingsdata ? (
+              <p className="mb-0">Stromingsdata wordt geladen...</p>
+            ) : null}
+            {selectedSiteId !== '' && stromingsdataError ? (
+              <p className="mb-0">{stromingsdataError}</p>
+            ) : null}
+            {selectedSiteId !== '' &&
+            !isLoadingStromingsdata &&
+            !stromingsdataError ? (
+              <p className="mb-0">
+                Chart placeholder voor <strong>{selectedSiteName}</strong>. Data
+                ontvangen via <code>fetchStromingsdata</code>:
+                <code>{` ${JSON.stringify(stromingsdata)}`}</code>
+              </p>
+            ) : null}
           </div>
         </section>
       </Container>
