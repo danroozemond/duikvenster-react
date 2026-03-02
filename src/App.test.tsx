@@ -2,10 +2,11 @@ import { render, screen } from '@testing-library/react'
 import App from './App'
 
 describe('App', () => {
-  it('renders the starter heading', () => {
+  it('renders navbar brand and dive site selector', () => {
     render(<App />)
+    expect(screen.getByRole('link', { name: /duikvenster/i })).toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { name: /duikvenster dive planner/i }),
+      screen.getByRole('combobox', { name: /select dive site/i }),
     ).toBeInTheDocument()
   })
 })
