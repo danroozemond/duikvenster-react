@@ -40,15 +40,6 @@ function HomePage() {
         onSiteChange={setSelectedSiteId}
       />
       <Container className="app-main py-5 py-lg-6">
-        <section className="hero-card">
-          <p className="hero-kicker mb-2">Dive Planner</p>
-          <h1 className="hero-title mb-3">Plan smarter duiken in one view</h1>
-          <p className="hero-text mb-0">
-            Kies je stek bovenaan. Daarna gebruiken we die keuze om getijden,
-            omstandigheden en een visuele planning in te laden.
-          </p>
-        </section>
-
         <section className="chart-card mt-4 mt-lg-5">
           <div className="chart-card-header">
             <h2 className="chart-card-title mb-0">Site overzicht</h2>
