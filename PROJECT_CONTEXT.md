@@ -16,17 +16,19 @@
 - Non-goal 2:
 
 ## 4) Tech Stack
-- Frontend: React and Bootstrap
+- Frontend: React, TypeScript, and Bootstrap
 - Backend: No backend
 - Runtime(s): Node.js LTS
 - Package manager: npm
-- Build tools:
+- Build tools: Vite
 
 ## 5) Architecture Preferences
 - Overall architecture style: Smaller files, more components
 - Folder/module organization: no preference
 - Patterns to prefer:
 - Patterns to avoid:
+- TypeScript preference: Use TypeScript for all new application code
+- Type safety: Prefer explicit types for props, state shapes, and shared domain models
 
 ## 6) Quality Bar
 - Testing expectations (unit/integration/e2e): focus on unit tests
