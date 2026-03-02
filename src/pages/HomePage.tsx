@@ -42,7 +42,7 @@ function HomePage() {
       <Container className="app-main py-5 py-lg-6">
         <section className="chart-card mt-4 mt-lg-5">
           <div className="chart-card-header">
-            <h2 className="chart-card-title mb-0">Site overzicht</h2>
+            <h2 className="chart-card-title mb-0">Stroming</h2>
             <span className="chart-badge">
               {selectedSiteName || 'Nog geen stek geselecteerd'}
             </span>
