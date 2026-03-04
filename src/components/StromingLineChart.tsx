@@ -201,7 +201,7 @@ function StromingLineChart({ events }: Props) {
         text: 'Geen data beschikbaar.',
       },
     }),
-    [axisBounds, handleViewportChange, points, xAxisAnnotations],
+    [axisBounds, points, xAxisAnnotations],
   )
 
   const resetZoom = useCallback(() => {
