@@ -6,24 +6,20 @@ export type Duikvenster = {
 }
 
 export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
-  // Placeholder logic to derive "van/tot" windows from the same raw data as the chart.
-  // Replace with real duikvenster rules later.
-  const orderedTimeStamps = stromingsdata
+  // Logic to derive "van/tot" windows
+  const orderedData:StromingEvent[] = stromingsdata
     .map(toStromingEvent)
     .filter((event): event is StromingEvent => event !== null)
-    .sort(
-      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-    )
-    .map((event) => event.timestamp)
+    .sort()
 
   const windows: Duikvenster[] = []
 
-  for (let index = 0; index < orderedTimeStamps.length - 1; index += 2) {
+  orderedData.forEach(strev => {
     windows.push({
-      van: orderedTimeStamps[index],
-      tot: orderedTimeStamps[index + 1],
+      van: strev.timestamp,
+      tot: strev.timestamp
     })
-  }
+  })
 
   return windows
 }
