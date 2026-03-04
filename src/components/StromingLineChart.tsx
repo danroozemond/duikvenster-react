@@ -17,6 +17,16 @@ type Props = {
   events: unknown[]
 }
 
+function stripTrailingZeroValues(points: ApexPoint[]): ApexPoint[] {
+  let endIndex = points.length
+
+  while (endIndex > 0 && points[endIndex - 1].y === 0) {
+    endIndex -= 1
+  }
+
+  return points.slice(0, endIndex)
+}
+
 function toStromingEvent(event: unknown): StromingEvent | null {
   if (typeof event !== 'object' || event === null) {
     return null
@@ -40,10 +50,12 @@ function toStromingEvent(event: unknown): StromingEvent | null {
 
 function StromingLineChart({ events }: Props) {
   const points = useMemo<ApexPoint[]>(() => {
-    return events
+    const mappedPoints = events
       .map(toStromingEvent)
       .filter((event): event is StromingEvent => event !== null)
       .map((event) => ({ x: event.timestamp, y: event.value }))
+
+    return stripTrailingZeroValues(mappedPoints)
   }, [events])
 
   const series = useMemo(
