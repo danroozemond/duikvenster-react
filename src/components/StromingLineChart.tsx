@@ -71,7 +71,7 @@ function StromingLineChart({ events }: Props) {
       },
       yaxis: {
         title: {
-          text: 'Waarde',
+          text: 'Stroomsnelheid (m/s)',
         },
         labels: {
           formatter: (value) => Number(value).toFixed(2),
