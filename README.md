@@ -1,73 +1,86 @@
-# React + TypeScript + Vite
+# Duikvenster React
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite frontend for `duikvenster.nl`.
 
-Currently, two official plugins are available:
+## App development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Build production assets:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
 ```
+
+## AWS static hosting with OpenTofu
+
+Infrastructure code lives in `infra/opentofu` and creates:
+
+- Private S3 bucket (`duikvenster-react`)
+- CloudFront distribution with IPv4 + IPv6
+- HTTPS-only viewer policy (HTTP redirects to HTTPS)
+- 301 redirect from `www.duikvenster.nl` to `duikvenster.nl`
+- ACM certificate in `us-east-1` with DNS validation
+- Route 53 hosted zone and `A`/`AAAA` alias records for:
+  - `duikvenster.nl`
+  - `www.duikvenster.nl`
+
+### 1. Prerequisites
+
+- OpenTofu installed (`tofu`)
+- AWS CLI configured with credentials that can manage S3, CloudFront, ACM, and Route 53
+- Domain registrar access for `duikvenster.nl`
+
+### 2. Configure variables
+
+```bash
+cd infra/opentofu
+cp terraform.tfvars.example terraform.tfvars
+```
+
+Defaults are already set for your requested setup:
+
+- `bucket_name = "duikvenster-react"`
+- `domain_name = "duikvenster.nl"`
+- `aliases = ["duikvenster.nl", "www.duikvenster.nl"]`
+- `aws_region = "eu-west-2"`
+- `create_hosted_zone = true`
+
+### 3. Provision infrastructure
+
+```bash
+tofu init
+tofu plan
+tofu apply
+```
+
+After apply, capture the Route 53 nameservers:
+
+```bash
+tofu output route53_name_servers
+```
+
+Update the NS records at your registrar for `duikvenster.nl` to these AWS nameservers.
+
+### 4. Deploy the site build
+
+From repository root:
+
+```bash
+./scripts/deploy.sh
+```
+
+### 5. Verify
+
+- `https://duikvenster.nl`
+- `https://www.duikvenster.nl`
+
+Both should resolve over CloudFront and work on IPv4/IPv6.
+
+## Notes
+
+- If you already have a Route 53 hosted zone, set `create_hosted_zone = false`.
+- ACM cert for CloudFront must stay in `us-east-1` by AWS design; this is handled in the IaC while the rest defaults to `eu-west-2`.

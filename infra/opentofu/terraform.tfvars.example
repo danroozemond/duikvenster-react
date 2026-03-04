@@ -1,0 +1,5 @@
+aws_region         = "eu-west-2"
+domain_name        = "duikvenster.nl"
+aliases            = ["duikvenster.nl", "www.duikvenster.nl"]
+bucket_name        = "duikvenster-react"
+create_hosted_zone = true
