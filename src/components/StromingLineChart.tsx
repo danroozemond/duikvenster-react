@@ -25,6 +25,11 @@ type Props = {
   events: unknown[]
 }
 
+type XAxisRange = {
+  min?: number
+  max?: number
+}
+
 const STROMING_CHART_ID = 'stroming-line-chart'
 const ZOOM_TOLERANCE_MS = 1_000
 
@@ -113,6 +118,25 @@ function StromingLineChart({ events }: Props) {
     setIsZoomed(false)
   }, [axisBounds?.min, axisBounds?.max])
 
+  const handleViewportChange = useCallback(
+    (xaxis?: XAxisRange) => {
+      if (!axisBounds) {
+        setIsZoomed(false)
+        return
+      }
+
+      setIsZoomed(
+        isZoomedRange(
+          xaxis?.min ?? axisBounds.min,
+          xaxis?.max ?? axisBounds.max,
+          axisBounds.min,
+          axisBounds.max,
+        ),
+      )
+    },
+    [axisBounds],
+  )
+
   const options = useMemo<ApexOptions>(
     () => ({
       chart: {
@@ -121,34 +145,10 @@ function StromingLineChart({ events }: Props) {
         toolbar: { show: false },
         events: {
           zoomed: (_, { xaxis }) => {
-            if (!axisBounds) {
-              setIsZoomed(false)
-              return
-            }
-
-            setIsZoomed(
-              isZoomedRange(
-                xaxis?.min ?? axisBounds.min,
-                xaxis?.max ?? axisBounds.max,
-                axisBounds.min,
-                axisBounds.max,
-              ),
-            )
+            handleViewportChange(xaxis)
           },
           scrolled: (_, { xaxis }) => {
-            if (!axisBounds) {
-              setIsZoomed(false)
-              return
-            }
-
-            setIsZoomed(
-              isZoomedRange(
-                xaxis?.min ?? axisBounds.min,
-                xaxis?.max ?? axisBounds.max,
-                axisBounds.min,
-                axisBounds.max,
-              ),
-            )
+            handleViewportChange(xaxis)
           },
         },
       },
@@ -201,7 +201,7 @@ function StromingLineChart({ events }: Props) {
         text: 'Geen data beschikbaar.',
       },
     }),
-    [axisBounds, points, xAxisAnnotations],
+    [axisBounds, handleViewportChange, points, xAxisAnnotations],
   )
 
   const resetZoom = useCallback(() => {
