@@ -84,11 +84,11 @@ describe('stromingChartTime', () => {
     ])
   })
 
-  it('formats axis label as DD-MMM HH:mm', () => {
+  it('formats axis label as ddd DD, HHu', () => {
     const valueMs = new Date(2026, 2, 4, 6, 5, 0).getTime()
     const formatted = formatLocalAxisDateTime(valueMs)
 
-    expect(formatted).toMatch(/^\d{2}-[A-Za-z]{3} \d{2}:\d{2}$/)
+    expect(formatted).toMatch(/^[A-Za-z]{3} \d{2}, \d{2}u$/)
   })
 
   it('formats tooltip label with full local date and time', () => {

@@ -14,19 +14,19 @@ const SIX_HOURS_MS = 6 * 60 * 60 * 1000
 
 export function formatLocalAxisDateTime(valueMs: number): string {
   const date = new Date(valueMs)
-  const dayMonth = new Intl.DateTimeFormat('en-GB', {
+  const weekday = new Intl.DateTimeFormat('en-GB', {
+    weekday: 'short',
+  }).format(date)
+  const day = new Intl.DateTimeFormat('en-GB', {
     day: '2-digit',
-    month: 'short',
   })
     .format(date)
-    .replace(' ', '-')
-  const time = new Intl.DateTimeFormat('en-GB', {
+  const hour = new Intl.DateTimeFormat('en-GB', {
     hour: '2-digit',
-    minute: '2-digit',
     hour12: false,
   }).format(date)
 
-  return `${dayMonth} ${time}`
+  return `${weekday} ${day}, ${hour}u`
 }
 
 export function formatLocalTooltipDateTime(valueMs: number): string {
