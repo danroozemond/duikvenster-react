@@ -3,6 +3,8 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 INFRA_DIR="${REPO_ROOT}/infra/opentofu"
+AWS_PROFILE="${AWS_PROFILE:-duikvenster}"
+export AWS_PROFILE
 
 cd "${REPO_ROOT}"
 
