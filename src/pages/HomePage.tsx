@@ -1,6 +1,7 @@
 import Container from 'react-bootstrap/Container'
 import { useEffect, useState } from 'react'
 import AppNavbar from '../components/AppNavbar'
+import StromingLineChart from '../components/StromingLineChart'
 import diveSites from '../data/diveSites.json'
 import { fetchStromingsdata } from '../utils/stromingsdata'
 
@@ -20,7 +21,7 @@ function HomePage() {
 
     return ''
   })
-  const [stromingsdata, setStromingsdata] = useState<unknown>(null)
+  const [stromingsdata, setStromingsdata] = useState<unknown[] | null>(null)
   const [isLoadingStromingsdata, setIsLoadingStromingsdata] = useState(false)
   const [stromingsdataError, setStromingsdataError] = useState<string | null>(null)
 
@@ -106,11 +107,13 @@ function HomePage() {
             {selectedSiteId !== '' &&
             !isLoadingStromingsdata &&
             !stromingsdataError ? (
-              <p className="mb-0">
-                Chart placeholder voor <strong>{selectedSiteName}</strong>. Data
-                ontvangen via <code>fetchStromingsdata</code>:
-                <code>{` ${JSON.stringify(stromingsdata)}`}</code>
-              </p>
+              stromingsdata !== null && stromingsdata.length > 0 ? (
+                <StromingLineChart events={stromingsdata} />
+              ) : (
+                <p className="mb-0">
+                  Geen stromingsdata beschikbaar voor <strong>{selectedSiteName}</strong>.
+                </p>
+              )
             ) : null}
           </div>
         </section>
