@@ -113,6 +113,22 @@ function StromingLineChart({ events }: Props) {
     () => buildSixHourAnnotations(timestamps),
     [timestamps],
   )
+  const nowAnnotation = useMemo(
+    () => ({
+      x: Date.now(),
+      borderColor: '#d9534f',
+      borderWidth: 1,
+      strokeDashArray: 4,
+      label: {
+        text: 'nu',
+        style: {
+          background: '#d9534f',
+          color: '#ffffff',
+        },
+      },
+    }),
+    [axisBounds?.min, axisBounds?.max],
+  )
 
   useEffect(() => {
     setIsZoomed(false)
@@ -187,7 +203,7 @@ function StromingLineChart({ events }: Props) {
         },
       },
       annotations: {
-        xaxis: xAxisAnnotations,
+        xaxis: [...xAxisAnnotations, nowAnnotation],
       },
       yaxis: {
         title: {
@@ -201,7 +217,7 @@ function StromingLineChart({ events }: Props) {
         text: 'Geen data beschikbaar.',
       },
     }),
-    [axisBounds, points, xAxisAnnotations],
+    [axisBounds, nowAnnotation, points, xAxisAnnotations],
   )
 
   const resetZoom = useCallback(() => {
