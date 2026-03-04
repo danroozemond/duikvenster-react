@@ -126,15 +126,13 @@ function StromingLineChart({ events }: Props) {
               return
             }
 
-            const min = xaxis?.min
-            const max = xaxis?.max
-            if (typeof min !== 'number' || typeof max !== 'number') {
-              setIsZoomed(false)
-              return
-            }
-
             setIsZoomed(
-              isZoomedRange(min, max, axisBounds.min, axisBounds.max),
+              isZoomedRange(
+                xaxis?.min ?? axisBounds.min,
+                xaxis?.max ?? axisBounds.max,
+                axisBounds.min,
+                axisBounds.max,
+              ),
             )
           },
           scrolled: (_, { xaxis }) => {
@@ -143,15 +141,13 @@ function StromingLineChart({ events }: Props) {
               return
             }
 
-            const min = xaxis?.min
-            const max = xaxis?.max
-            if (typeof min !== 'number' || typeof max !== 'number') {
-              setIsZoomed(false)
-              return
-            }
-
             setIsZoomed(
-              isZoomedRange(min, max, axisBounds.min, axisBounds.max),
+              isZoomedRange(
+                xaxis?.min ?? axisBounds.min,
+                xaxis?.max ?? axisBounds.max,
+                axisBounds.min,
+                axisBounds.max,
+              ),
             )
           },
         },
