@@ -1,5 +1,6 @@
-import { lazy, Suspense, useMemo } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import type { ApexOptions } from 'apexcharts'
+import ApexCharts from 'apexcharts'
 import {
   buildSixHourAnnotations,
   buildSixHourAxisBounds,
@@ -23,6 +24,9 @@ type ApexPoint = {
 type Props = {
   events: unknown[]
 }
+
+const STROMING_CHART_ID = 'stroming-line-chart'
+const ZOOM_TOLERANCE_MS = 1_000
 
 function stripTrailingZeroValues(points: ApexPoint[]): ApexPoint[] {
   let endIndex = points.length
@@ -55,7 +59,21 @@ function toStromingEvent(event: unknown): StromingEvent | null {
   return { timestamp: rawTimestamp, value: numericValue }
 }
 
+function isZoomedRange(
+  min: number,
+  max: number,
+  defaultMin: number,
+  defaultMax: number,
+): boolean {
+  return (
+    Math.abs(min - defaultMin) > ZOOM_TOLERANCE_MS ||
+    Math.abs(max - defaultMax) > ZOOM_TOLERANCE_MS
+  )
+}
+
 function StromingLineChart({ events }: Props) {
+  const [isZoomed, setIsZoomed] = useState(false)
+
   const points = useMemo<ApexPoint[]>(() => {
     const mappedPoints = events
       .map(toStromingEvent)
@@ -91,11 +109,52 @@ function StromingLineChart({ events }: Props) {
     [timestamps],
   )
 
+  useEffect(() => {
+    setIsZoomed(false)
+  }, [axisBounds?.min, axisBounds?.max])
+
   const options = useMemo<ApexOptions>(
     () => ({
       chart: {
+        id: STROMING_CHART_ID,
         type: 'line',
         toolbar: { show: false },
+        events: {
+          zoomed: (_, { xaxis }) => {
+            if (!axisBounds) {
+              setIsZoomed(false)
+              return
+            }
+
+            const min = xaxis?.min
+            const max = xaxis?.max
+            if (typeof min !== 'number' || typeof max !== 'number') {
+              setIsZoomed(false)
+              return
+            }
+
+            setIsZoomed(
+              isZoomedRange(min, max, axisBounds.min, axisBounds.max),
+            )
+          },
+          scrolled: (_, { xaxis }) => {
+            if (!axisBounds) {
+              setIsZoomed(false)
+              return
+            }
+
+            const min = xaxis?.min
+            const max = xaxis?.max
+            if (typeof min !== 'number' || typeof max !== 'number') {
+              setIsZoomed(false)
+              return
+            }
+
+            setIsZoomed(
+              isZoomedRange(min, max, axisBounds.min, axisBounds.max),
+            )
+          },
+        },
       },
       stroke: {
         curve: 'straight',
@@ -149,9 +208,45 @@ function StromingLineChart({ events }: Props) {
     [axisBounds, points, xAxisAnnotations],
   )
 
+  const resetZoom = useCallback(() => {
+    if (!axisBounds) {
+      return
+    }
+
+    void ApexCharts.exec(
+      STROMING_CHART_ID,
+      'zoomX',
+      axisBounds.min,
+      axisBounds.max,
+    )
+  }, [axisBounds])
+
   return (
     <Suspense fallback={<p className="mb-0">Chart wordt geladen...</p>}>
       <div className="stroming-line-chart">
+        <div className="stroming-line-chart-actions">
+          {isZoomed ? (
+            <button
+              type="button"
+              className="btn btn-outline-secondary btn-sm"
+              onClick={resetZoom}
+              disabled={axisBounds === null}
+              aria-label="Reset zoom"
+              title="Reset zoom"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+                aria-hidden="true"
+              >
+                <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 2 8h1v6a.5.5 0 0 0 .5.5H6a.5.5 0 0 0 .5-.5V10h3v4a.5.5 0 0 0 .5.5h2.5a.5.5 0 0 0 .5-.5V8h1a.5.5 0 0 0 .354-.854z" />
+              </svg>
+            </button>
+          ) : null}
+        </div>
         <ReactApexChart
           type="line"
           height={320}
