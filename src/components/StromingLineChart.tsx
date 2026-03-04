@@ -64,6 +64,7 @@ function StromingLineChart({ events }: Props) {
       },
       stroke: {
         curve: 'straight',
+        width: 1.5,
       },
       xaxis: {
         type: 'datetime',
@@ -71,6 +72,9 @@ function StromingLineChart({ events }: Props) {
       yaxis: {
         title: {
           text: 'Waarde',
+        },
+        labels: {
+          formatter: (value) => Number(value).toFixed(2),
         },
       },
       noData: {
@@ -82,7 +86,15 @@ function StromingLineChart({ events }: Props) {
 
   return (
     <Suspense fallback={<p className="mb-0">Chart wordt geladen...</p>}>
-      <ReactApexChart type="line" height={320} options={options} series={series} />
+      <div className="stroming-line-chart">
+        <ReactApexChart
+          type="line"
+          height={320}
+          width="100%"
+          options={options}
+          series={series}
+        />
+      </div>
     </Suspense>
   )
 }
