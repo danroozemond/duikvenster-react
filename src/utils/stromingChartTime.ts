@@ -7,6 +7,7 @@ export type SixHourAxisBounds = {
 export type SixHourAnnotation = {
   x: number
   borderColor: string
+  borderWidth: number
   strokeDashArray: number
 }
 
@@ -95,9 +96,12 @@ export function buildSixHourAnnotations(
   const annotations: SixHourAnnotation[] = []
 
   for (let markerMs = minMs; markerMs <= maxMs; markerMs += SIX_HOURS_MS) {
+    const markerDate = new Date(markerMs)
+    const isMidnight = markerDate.getHours() === 0
     annotations.push({
       x: markerMs,
-      borderColor: '#d3d7df',
+      borderColor: isMidnight ? '#9aa3b2' : '#d3d7df',
+      borderWidth: isMidnight ? 2 : 1,
       strokeDashArray: 0,
     })
   }

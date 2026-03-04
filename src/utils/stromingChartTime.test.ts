@@ -54,7 +54,7 @@ describe('stromingChartTime', () => {
     expect(buildSixHourAnnotations([])).toEqual([])
   })
 
-  it('builds light-grey 6-hour annotations across bounds', () => {
+  it('builds 6-hour annotations with heavier midnight lines', () => {
     const timestamps = [
       new Date(2026, 2, 4, 1, 0, 0).getTime(),
       new Date(2026, 2, 4, 13, 0, 0).getTime(),
@@ -63,22 +63,26 @@ describe('stromingChartTime', () => {
     expect(buildSixHourAnnotations(timestamps)).toEqual([
       {
         x: new Date(2026, 2, 4, 0, 0, 0).getTime(),
-        borderColor: '#d3d7df',
-        strokeDashArray: 0,
+        borderColor: '#9aa3b2',
+        borderWidth: 2,
+      strokeDashArray: 0,
       },
       {
         x: new Date(2026, 2, 4, 6, 0, 0).getTime(),
         borderColor: '#d3d7df',
+        borderWidth: 1,
         strokeDashArray: 0,
       },
       {
         x: new Date(2026, 2, 4, 12, 0, 0).getTime(),
         borderColor: '#d3d7df',
+        borderWidth: 1,
         strokeDashArray: 0,
       },
       {
         x: new Date(2026, 2, 4, 18, 0, 0).getTime(),
         borderColor: '#d3d7df',
+        borderWidth: 1,
         strokeDashArray: 0,
       },
     ])
