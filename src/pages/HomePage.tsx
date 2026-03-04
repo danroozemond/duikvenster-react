@@ -117,6 +117,24 @@ function HomePage() {
               )
             ) : null}
           </div>
+          <div className="chart-links mt-3">
+            <a
+              className="btn btn-outline-primary"
+              href="http://duikspotter.nl/getijden-kaart/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Getijdenkaart
+            </a>
+            <a
+              className="btn btn-outline-primary"
+              href="https://rwsos.rws.nl/viewer/embed/chart/oosterschelde/stroming/location/znp2?pd=-1%3B2&timeslider&theme=light&components=current-maps2d"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Stroomsnelheid van RWS
+            </a>
+          </div>
         </section>
         <section className="chart-card mt-4">
           <h2 className="chart-card-title mb-3">Let op</h2>
