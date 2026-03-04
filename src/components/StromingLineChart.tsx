@@ -89,7 +89,7 @@ function StromingLineChart({ events }: Props) {
           return null
         }
 
-        return { x: timestampMs, y: event.value }
+        return { x: timestampMs, y: 100.0*event.value }
       })
       .filter((point): point is ApexPoint => point !== null)
       .sort((a, b) => a.x - b.x)
@@ -207,10 +207,10 @@ function StromingLineChart({ events }: Props) {
       },
       yaxis: {
         title: {
-          text: 'Stroomsnelheid (m/s)',
+          text: 'Stroomsnelheid (cm/s)',
         },
         labels: {
-          formatter: (value) => Number(value).toFixed(2),
+          formatter: (value) => Number(value).toFixed(0),
         },
       },
       noData: {
