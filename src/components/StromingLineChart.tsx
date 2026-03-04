@@ -204,6 +204,14 @@ function StromingLineChart({ events }: Props) {
       },
       annotations: {
         xaxis: [...xAxisAnnotations, nowAnnotation],
+        yaxis: [
+          {
+            y: 20,
+            borderColor: '#1f3b6f',
+            borderWidth: 2,
+            strokeDashArray: 4,
+          },
+        ],
       },
       yaxis: {
         title: {
