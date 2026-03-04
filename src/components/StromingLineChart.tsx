@@ -1,5 +1,12 @@
 import { lazy, Suspense, useMemo } from 'react'
 import type { ApexOptions } from 'apexcharts'
+import {
+  buildSixHourAnnotations,
+  buildSixHourAxisBounds,
+  formatLocalAxisDateTime,
+  formatLocalTooltipDateTime,
+  toTimestampMs,
+} from '../utils/stromingChartTime'
 
 const ReactApexChart = lazy(() => import('react-apexcharts'))
 
@@ -17,8 +24,6 @@ type Props = {
   events: unknown[]
 }
 
-const SIX_HOURS_MS = 6 * 60 * 60 * 1000
-
 function stripTrailingZeroValues(points: ApexPoint[]): ApexPoint[] {
   let endIndex = points.length
 
@@ -27,99 +32,6 @@ function stripTrailingZeroValues(points: ApexPoint[]): ApexPoint[] {
   }
 
   return points.slice(0, endIndex)
-}
-
-function formatLocalAxisDateTime(valueMs: number): string {
-  const date = new Date(valueMs)
-  const dayMonth = new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'short',
-  })
-    .format(date)
-    .replace(' ', '-')
-  const time = new Intl.DateTimeFormat('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  }).format(date)
-
-  return `${dayMonth} ${time}`
-}
-
-function formatLocalTooltipDateTime(valueMs: number): string {
-  return new Intl.DateTimeFormat('nl-NL', {
-    weekday: 'short',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-  }).format(new Date(valueMs))
-}
-
-function toTimestampMs(value: string): number | null {
-  const timestampMs = Date.parse(value)
-  if (Number.isNaN(timestampMs)) {
-    return null
-  }
-
-  return timestampMs
-}
-
-function alignLocalFloorToSixHours(valueMs: number): number {
-  const date = new Date(valueMs)
-  date.setMinutes(0, 0, 0)
-  date.setHours(Math.floor(date.getHours() / 6) * 6)
-  return date.getTime()
-}
-
-function alignLocalCeilToSixHours(valueMs: number): number {
-  const floorMs = alignLocalFloorToSixHours(valueMs)
-  if (floorMs === valueMs) {
-    return floorMs
-  }
-
-  return floorMs + SIX_HOURS_MS
-}
-
-function buildSixHourAxisBounds(points: ApexPoint[]): {
-  min: number
-  max: number
-  tickAmount: number
-} | null {
-  if (points.length === 0) {
-    return null
-  }
-
-  const minPointMs = Math.min(...points.map((point) => point.x))
-  const maxPointMs = Math.max(...points.map((point) => point.x))
-  const min = alignLocalFloorToSixHours(minPointMs)
-  const max = alignLocalCeilToSixHours(maxPointMs)
-  const tickAmount = Math.floor((max - min) / SIX_HOURS_MS) + 1
-
-  return { min, max, tickAmount }
-}
-
-function buildSixHourAnnotations(points: ApexPoint[]): NonNullable<ApexOptions['annotations']>['xaxis'] {
-  if (points.length === 0) {
-    return []
-  }
-
-  const minMs = alignLocalFloorToSixHours(Math.min(...points.map((point) => point.x)))
-  const maxMs = alignLocalCeilToSixHours(Math.max(...points.map((point) => point.x)))
-
-  const annotations: NonNullable<ApexOptions['annotations']>['xaxis'] = []
-  for (let markerMs = minMs; markerMs <= maxMs; markerMs += SIX_HOURS_MS) {
-    annotations.push({
-      x: markerMs,
-      borderColor: '#d3d7df',
-      strokeDashArray: 0,
-    })
-  }
-
-  return annotations
 }
 
 function toStromingEvent(event: unknown): StromingEvent | null {
@@ -172,7 +84,12 @@ function StromingLineChart({ events }: Props) {
     [points],
   )
 
-  const axisBounds = useMemo(() => buildSixHourAxisBounds(points), [points])
+  const timestamps = useMemo(() => points.map((point) => point.x), [points])
+  const axisBounds = useMemo(() => buildSixHourAxisBounds(timestamps), [timestamps])
+  const xAxisAnnotations = useMemo(
+    () => buildSixHourAnnotations(timestamps),
+    [timestamps],
+  )
 
   const options = useMemo<ApexOptions>(
     () => ({
@@ -215,7 +132,7 @@ function StromingLineChart({ events }: Props) {
         },
       },
       annotations: {
-        xaxis: buildSixHourAnnotations(points),
+        xaxis: xAxisAnnotations,
       },
       yaxis: {
         title: {
@@ -229,7 +146,7 @@ function StromingLineChart({ events }: Props) {
         text: 'Geen data beschikbaar.',
       },
     }),
-    [axisBounds, points],
+    [axisBounds, points, xAxisAnnotations],
   )
 
   return (
