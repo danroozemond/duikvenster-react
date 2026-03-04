@@ -78,7 +78,7 @@ export function buildSixHourAxisBounds(
   const maxTimestampMs = Math.max(...timestamps)
   const min = alignLocalFloorToSixHours(minTimestampMs)
   const max = alignLocalCeilToSixHours(maxTimestampMs)
-  const tickAmount = Math.floor((max - min) / SIX_HOURS_MS) + 1
+  const tickAmount = Math.max(1, Math.floor((max - min) / SIX_HOURS_MS))
 
   return { min, max, tickAmount }
 }

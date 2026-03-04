@@ -45,7 +45,7 @@ describe('stromingChartTime', () => {
     expect(buildSixHourAxisBounds(timestamps)).toEqual({
       min: new Date(2026, 2, 4, 0, 0, 0).getTime(),
       max: new Date(2026, 2, 4, 18, 0, 0).getTime(),
-      tickAmount: 4,
+      tickAmount: 3,
     })
   })
 
