@@ -1,35 +1,8 @@
+import { toStromingEvent, type StromingEvent } from './stromingEvent'
+
 export type Duikvenster = {
   van: string
   tot: string
-}
-
-type StromingEvent = {
-  timeStamp: string
-  value: number
-}
-
-function toStromingEvent(event: unknown): StromingEvent | null {
-  if (typeof event !== 'object' || event === null) {
-    return null
-  }
-
-  const rawTimeStamp = (event as { timeStamp?: unknown }).timeStamp
-  const rawValue = (event as { value?: unknown }).value
-
-  if (typeof rawTimeStamp !== 'string' || rawTimeStamp.trim() === '') {
-    return null
-  }
-
-  const numericValue =
-    typeof rawValue === 'number' ? rawValue : Number(rawValue)
-  if (!Number.isFinite(numericValue)) {
-    return null
-  }
-
-  return {
-    timeStamp: rawTimeStamp,
-    value: numericValue,
-  }
 }
 
 export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
@@ -39,10 +12,9 @@ export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
     .map(toStromingEvent)
     .filter((event): event is StromingEvent => event !== null)
     .sort(
-      (a, b) =>
-        new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime(),
+      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
     )
-    .map((event) => event.timeStamp)
+    .map((event) => event.timestamp)
 
   const windows: Duikvenster[] = []
 
