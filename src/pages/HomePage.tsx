@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import AppNavbar from '../components/AppNavbar'
 import Infotext from '../components/Infotext'
 import StromingLineChart from '../components/StromingLineChart'
+import DuikvenstersTable from '../components/DuikvenstersTable'
 import diveSites from '../data/diveSites.json'
 import { fetchStromingsdata } from '../utils/stromingsdata'
 
@@ -136,6 +137,12 @@ function HomePage() {
             </a>
           </div>
         </section>
+        {selectedSiteId !== '' &&
+        !isLoadingStromingsdata &&
+        !stromingsdataError &&
+        stromingsdata !== null ? (
+          <DuikvenstersTable events={stromingsdata} />
+        ) : null}
         <section className="chart-card mt-4">
           <h2 className="chart-card-title mb-3">Let op</h2>
           <Infotext />
