@@ -25,7 +25,7 @@ describe('fetchStromingsdata', () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      json: async () => ({ ok: true }),
+      json: async () => ({ results: [{ events: [] }] }),
     } as Response)
     vi.stubGlobal('fetch', fetchMock)
 
@@ -52,14 +52,14 @@ describe('fetchStromingsdata', () => {
     )
   })
 
-  it('stores fetched payload in localStorage as latest result with UTC datetimes', async () => {
+  it('stores fetched events in localStorage as latest result with UTC datetimes', async () => {
     vi.spyOn(Date.prototype, 'getTimezoneOffset').mockReturnValue(-60)
 
-    const payload = { values: [1, 2, 3] }
+    const events = [{ value: 1 }, { value: 2 }, { value: 3 }]
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      json: async () => payload,
+      json: async () => ({ results: [{ events }] }),
     } as Response)
     vi.stubGlobal('fetch', fetchMock)
 
@@ -77,13 +77,13 @@ describe('fetchStromingsdata', () => {
       'end',
     )
 
-    expect(result).toEqual(payload)
+    expect(result).toEqual(events)
     expect(window.localStorage.getItem(STROMINGSDATA_STORAGE_KEY)).toEqual(
       JSON.stringify({
         siteId: 'zeeheks',
         dateTimeFrom: expectedDateTimeFrom,
         dateTimeTo: expectedDateTimeTo,
-        payload,
+        events,
       }),
     )
   })
@@ -96,11 +96,11 @@ describe('fetchStromingsdata', () => {
       JSON.stringify({ siteId: 'old-site', payload: { cached: true } }),
     )
 
-    const payload = { live: true }
+    const events = [{ live: true }]
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      json: async () => payload,
+      json: async () => ({ results: [{ events }] }),
     } as Response)
     vi.stubGlobal('fetch', fetchMock)
 
@@ -110,7 +110,7 @@ describe('fetchStromingsdata', () => {
       '2026-03-04',
     )
 
-    expect(result).toEqual(payload)
+    expect(result).toEqual(events)
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
@@ -119,13 +119,13 @@ describe('fetchStromingsdata', () => {
 
     window.localStorage.setItem(
       STROMINGSDATA_STORAGE_KEY,
-      JSON.stringify({ siteId: 'old-site', payload: { old: true } }),
+      JSON.stringify({ siteId: 'old-site', events: [{ old: true }] }),
     )
-    const payload = { refreshed: true }
+    const events = [{ refreshed: true }]
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      json: async () => payload,
+      json: async () => ({ results: [{ events }] }),
     } as Response)
     vi.stubGlobal('fetch', fetchMock)
 
@@ -143,16 +143,35 @@ describe('fetchStromingsdata', () => {
       'end',
     )
 
-    expect(result).toEqual(payload)
+    expect(result).toEqual(events)
     expect(fetchMock).toHaveBeenCalledTimes(1)
     expect(window.localStorage.getItem(STROMINGSDATA_STORAGE_KEY)).toEqual(
       JSON.stringify({
         siteId: 'zeeheks',
         dateTimeFrom: expectedDateTimeFrom,
         dateTimeTo: expectedDateTimeTo,
-        payload,
+        events,
       }),
     )
+  })
+
+  it('returns empty list when response has no results[0].events', async () => {
+    vi.spyOn(Date.prototype, 'getTimezoneOffset').mockReturnValue(-60)
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ results: [] }),
+    } as Response)
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await fetchStromingsdata(
+      'zeeheks',
+      '2026-03-01',
+      '2026-03-04',
+    )
+
+    expect(result).toEqual([])
   })
 })
 

@@ -107,7 +107,7 @@ export async function fetchStromingsdata(
   siteId: string,
   dateFrom?: DateInput,
   dateTo?: DateInput,
-): Promise<unknown> {
+): Promise<unknown[]> {
   if (siteId.trim() === '') {
     throw new Error('siteId is required')
   }
@@ -128,23 +128,42 @@ export async function fetchStromingsdata(
     normalizedDateTimeFrom,
     normalizedDateTimeTo,
   )
-  const response = await fetch(url)
+  let events: unknown[] = []
 
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch stromingsdata for "${siteId}" (${normalizedDateTimeFrom} to ${normalizedDateTimeTo}): HTTP ${response.status}`,
-    )
+  try {
+    const response = await fetch(url)
+
+    if (response.ok) {
+      const payload: unknown = await response.json()
+      if (
+        typeof payload === 'object' &&
+        payload !== null &&
+        'results' in payload &&
+        Array.isArray((payload as { results: unknown[] }).results)
+      ) {
+        const firstResult = (payload as { results: unknown[] }).results[0]
+        if (
+          typeof firstResult === 'object' &&
+          firstResult !== null &&
+          'events' in firstResult &&
+          Array.isArray((firstResult as { events: unknown[] }).events)
+        ) {
+          events = (firstResult as { events: unknown[] }).events
+        }
+      }
+    }
+  } catch {
+    events = []
   }
 
-  const payload: unknown = await response.json()
   window.localStorage.setItem(
     STROMINGSDATA_STORAGE_KEY,
     JSON.stringify({
       siteId,
       dateTimeFrom: normalizedDateTimeFrom,
       dateTimeTo: normalizedDateTimeTo,
-      payload,
+      events,
     }),
   )
-  return payload
+  return events
 }
