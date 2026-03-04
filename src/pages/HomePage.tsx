@@ -85,8 +85,8 @@ function HomePage() {
         selectedSiteId={selectedSiteId}
         onSiteChange={setSelectedSiteId}
       />
-      <Container className="app-main py-5 py-lg-6">
-        <section className="chart-card mt-4 mt-lg-5">
+      <Container className="app-main py-3 py-lg-4">
+        <section className="chart-card mt-3 mt-lg-4">
           <div className="chart-card-header">
             <h2 className="chart-card-title mb-0">Stroming</h2>
             <span className="chart-badge">
