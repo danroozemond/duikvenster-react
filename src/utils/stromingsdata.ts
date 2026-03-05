@@ -1,7 +1,7 @@
 export const STROMINGSDATA_STORAGE_KEY = 'duikvenster.stromingsdata.latest'
 
 export const STROMINGSDATA_URL_TEMPLATE =
-  'https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG_SOF_6.1.ms&sourceName=compute&&locationCode={siteId}&&startTime={dateTimeFrom}&endTime={dateTimeTo}'
+  'https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG_SOF_6.1.ms&sourceName=compute&locationCode={siteId}&startTime={dateTimeFrom}&endTime={dateTimeTo}'
 
 type DateInput = Date | string
 
