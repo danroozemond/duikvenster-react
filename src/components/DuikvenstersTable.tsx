@@ -2,14 +2,18 @@ import { getDuikvensters } from '../utils/duikvensters'
 
 type Props = {
   events: unknown[]
+  badgeLabel: string
 }
 
-function DuikvenstersTable({ events }: Props) {
+function DuikvenstersTable({ events, badgeLabel }: Props) {
   const duikvensters = getDuikvensters(events)
 
   return (
     <section className="chart-card mt-4">
-      <h2 className="chart-card-title mb-3">Duikvensters</h2>
+      <div className="chart-card-header">
+        <h2 className="chart-card-title mb-0">Duikvensters</h2>
+        <span className="chart-badge">{badgeLabel}</span>
+      </div>
       <div className="duikvensters-table-wrapper">
         <table className="table table-sm mb-0 duikvensters-table">
           <thead>

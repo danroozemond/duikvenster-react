@@ -141,7 +141,10 @@ function HomePage() {
         !isLoadingStromingsdata &&
         !stromingsdataError &&
         stromingsdata !== null ? (
-          <DuikvenstersTable events={stromingsdata} />
+          <DuikvenstersTable
+            events={stromingsdata}
+            badgeLabel={selectedSiteName || 'Nog geen stek geselecteerd'}
+          />
         ) : null}
         <section className="chart-card mt-4">
           <h2 className="chart-card-title mb-3">Let op</h2>
