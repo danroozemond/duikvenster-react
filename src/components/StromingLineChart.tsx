@@ -189,8 +189,8 @@ function StromingLineChart({ events }: Props) {
         isZoomedRange(
           xaxis?.min ?? defaultAxisBounds.min,
           xaxis?.max ?? defaultAxisBounds.max,
-          fullAxisBounds.min,
-          fullAxisBounds.max,
+          fullAxisBounds?.min ?? defaultAxisBounds.min,
+          fullAxisBounds?.max ?? defaultAxisBounds.max,
         ),
       )
     },
