@@ -1,26 +1,31 @@
 import { toStromingEvent, type StromingEvent } from './stromingEvent'
 
-export type Duikvenster = {
+const DUIKVENSTER_THRESHOLD = 0.2 //=20 cm/s, suggested by NOB
+const MIN_DUIKVENSTER_DURATION_MS = 30 * 60 * 1000
+
+export class Duikvenster {
   van: string
   tot: string
   kentering: string
   kentering_value: number
-}
 
-const DUIKVENSTER_THRESHOLD = 0.2 //=20 cm/s, suggested by NOB
-const MIN_DUIKVENSTER_DURATION_MS = 30 * 60 * 1000
+  constructor(van: string, tot: string, kentering: string, kenteringValue: number) {
+    this.van = van
+    this.tot = tot
+    this.kentering = kentering
+    this.kentering_value = kenteringValue
+  }
 
-export const Duikvenster = {
-  hasMinimumDuration(window: Duikvenster): boolean {
-    const fromMs = new Date(window.van).getTime()
-    const toMs = new Date(window.tot).getTime()
+  hasMinimumDuration(): boolean {
+    const fromMs = new Date(this.van).getTime()
+    const toMs = new Date(this.tot).getTime()
 
     if (!Number.isFinite(fromMs) || !Number.isFinite(toMs)) {
       return false
     }
 
     return toMs - fromMs >= MIN_DUIKVENSTER_DURATION_MS
-  },
+  }
 }
 
 export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
@@ -36,8 +41,12 @@ export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
     if (se.value <= DUIKVENSTER_THRESHOLD) {
       // open new window, or extend existing window
       if (currentWindow === null) {
-        currentWindow = { van: se.timestamp, tot: se.timestamp,
-          kentering: se.timestamp, kentering_value: se.value}
+        currentWindow = new Duikvenster(
+          se.timestamp,
+          se.timestamp,
+          se.timestamp,
+          se.value,
+        )
       }
       // open/extend end of window
       currentWindow.tot = se.timestamp
@@ -48,7 +57,7 @@ export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
       }
     } else if (currentWindow !== null) {
       // close window (and store)
-      if (Duikvenster.hasMinimumDuration(currentWindow)) {
+      if (currentWindow.hasMinimumDuration()) {
         windows.push(currentWindow)
       }
       currentWindow = null
