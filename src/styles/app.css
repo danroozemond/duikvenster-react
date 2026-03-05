@@ -137,6 +137,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  position: relative;
 }
 
 .chart-card-title {
@@ -152,6 +153,7 @@ body {
   font-weight: 700;
   color: var(--accent-strong);
   background: rgba(15, 111, 216, 0.1);
+  white-space: nowrap;
 }
 
 .chart-placeholder {
@@ -256,8 +258,18 @@ body {
   }
 
   .chart-card-header {
-    flex-direction: column;
-    align-items: flex-start;
+    display: block;
+    min-height: 2rem;
+    padding-right: min(68%, 18rem);
+  }
+
+  .chart-card-header .chart-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    max-width: 65%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .chart-links .btn {
