@@ -9,7 +9,7 @@ export const STROMINGSDATA_URL_TEMPLATE =
 // note voorbeeld richting
 // https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG.2&sourceName=SOF_6&locationCode=znp2&startTime=2026-03-03T23%3A00%3A00Z&endTime=2026-03-07T22%3A59%3A59Z
 
-// note voorbeeld waterhoogte, dit zijn andere locaties
+// note voorbeeld waterhoogte, dit zijn andere locaties, dus onhandig.
 // https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=WT&sourceName=h_6&locationCode=zn&startTime=2026-03-03T23%3A00%3A00Z&endTime=2026-03-07T22%3A59%3A59Z
 
 
@@ -103,11 +103,12 @@ export function toUtcDateTimeFromLocalDate(
 }
 
 export function buildStromingsdataUrl(
+  url: string,
   siteId: string,
   dateTimeFrom: string,
   dateTimeTo: string,
 ): string {
-  return STROMINGSDATA_URL_TEMPLATE
+  return url
     .replace('{siteId}', encodeURIComponent(siteId))
     .replace('{dateTimeFrom}', encodeURIComponent(dateTimeFrom))
     .replace('{dateTimeTo}', encodeURIComponent(dateTimeTo))
@@ -134,6 +135,7 @@ export async function fetchStromingsdata(
   )
 
   const url = buildStromingsdataUrl(
+    STROMINGSDATA_URL_TEMPLATE,
     siteId,
     normalizedDateTimeFrom,
     normalizedDateTimeTo,
