@@ -5,11 +5,47 @@ type Props = {
   badgeLabel: string
 }
 
+function toDate(value: string): Date | null {
+  const parsed = new Date(value)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+function formatVanLocal(value: string): string {
+  const date = toDate(value)
+  if (date === null) {
+    return value
+  }
+
+  const weekday = date.toLocaleString('en-US', { weekday: 'short' })
+  const month = date.toLocaleString('en-US', { month: 'short' })
+  const day = date.toLocaleString('en-US', { day: '2-digit' })
+  const time = date.toLocaleString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })
+
+  return `${weekday} ${month} ${day}, ${time}`
+}
+
+function formatTotLocal(value: string): string {
+  const date = toDate(value)
+  if (date === null) {
+    return value
+  }
+
+  return date.toLocaleString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })
+}
+
 function DuikvenstersTable({ events, badgeLabel }: Props) {
   const duikvensters = getDuikvensters(events)
 
   return (
-    <section className="chart-card mt-4">
+    <section className="chart-card duikvensters-card mt-4">
       <div className="chart-card-header">
         <h2 className="chart-card-title mb-0">Duikvensters</h2>
         <span className="chart-badge">{badgeLabel}</span>
@@ -26,8 +62,8 @@ function DuikvenstersTable({ events, badgeLabel }: Props) {
             {duikvensters.length > 0 ? (
               duikvensters.map((duikvenster, index) => (
                 <tr key={`${duikvenster.van}-${duikvenster.tot}-${index}`}>
-                  <td>{duikvenster.van}</td>
-                  <td>{duikvenster.tot}</td>
+                  <td>{formatVanLocal(duikvenster.van)}</td>
+                  <td>{formatTotLocal(duikvenster.tot)}</td>
                 </tr>
               ))
             ) : (

@@ -191,16 +191,31 @@ body {
   border: 1px solid rgba(21, 34, 56, 0.1);
   border-radius: 14px;
   overflow: hidden;
+  width: fit-content;
+  max-width: 100%;
+  margin: 1rem auto 0;
 }
 
 .duikvensters-table {
   margin-bottom: 0;
+  width: auto;
+  min-width: 360px;
 }
 
 .duikvensters-table thead th {
   color: var(--ink-700);
   font-weight: 700;
   background: rgba(15, 111, 216, 0.08);
+}
+
+.duikvensters-table th,
+.duikvensters-table td {
+  white-space: nowrap;
+  padding: 0.65rem 1rem;
+}
+
+.duikvensters-card {
+  padding: clamp(1.5rem, 3vw, 2.25rem);
 }
 
 @media (min-width: 992px) {
