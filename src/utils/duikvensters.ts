@@ -51,7 +51,7 @@ export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
       // open/extend end of window
       currentWindow.tot = se.timestamp
       // update minimum
-      if ( currentWindow.kentering_value < se.value ) {
+      if ( currentWindow.kentering_value > se.value ) {
         currentWindow.kentering = se.timestamp
         currentWindow.kentering_value = se.value
       }

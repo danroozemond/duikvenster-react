@@ -528,21 +528,23 @@ describe('getDuikvensters', () => {
             {"timeStamp": "2026-03-06T14:00:00Z", "value": 0.55}
         ]
 
-        expect(getDuikvensters(stromingsdata)).toEqual([
-            {van: '2026-03-03T02:00:00Z', tot: '2026-03-03T02:50:00Z'},
-            {van: '2026-03-03T08:20:00Z', tot: '2026-03-03T09:00:00Z'},
-            {van: '2026-03-03T14:30:00Z', tot: '2026-03-03T15:10:00Z'},
-            {van: '2026-03-03T20:40:00Z', tot: '2026-03-03T21:20:00Z'},
-            {van: '2026-03-04T02:40:00Z', tot: '2026-03-04T03:20:00Z'},
-            {van: '2026-03-04T09:00:00Z', tot: '2026-03-04T09:40:00Z'},
-            {van: '2026-03-04T15:10:00Z', tot: '2026-03-04T15:50:00Z'},
-            {van: '2026-03-04T21:10:00Z', tot: '2026-03-04T21:50:00Z'},
-            {van: '2026-03-05T03:20:00Z', tot: '2026-03-05T04:00:00Z'},
-            {van: '2026-03-05T09:40:00Z', tot: '2026-03-05T10:20:00Z'},
-            {van: '2026-03-05T15:40:00Z', tot: '2026-03-05T16:30:00Z'},
-            {van: '2026-03-05T21:50:00Z', tot: '2026-03-05T22:30:00Z'},
-            {van: '2026-03-06T03:50:00Z', tot: '2026-03-06T04:40:00Z'},
-            {van: '2026-03-06T10:20:00Z', tot: '2026-03-06T10:50:00Z'},
+        expect(
+            getDuikvensters(stromingsdata).map(({van, tot, kentering}) => ({van, tot, kentering}))
+        ).toEqual([
+            {van: '2026-03-03T02:00:00Z', tot: '2026-03-03T02:50:00Z', kentering: '2026-03-03T02:30:00Z'},
+            {van: '2026-03-03T08:20:00Z', tot: '2026-03-03T09:00:00Z', kentering: '2026-03-03T08:40:00Z'},
+            {van: '2026-03-03T14:30:00Z', tot: '2026-03-03T15:10:00Z', kentering: '2026-03-03T15:00:00Z'},
+            {van: '2026-03-03T20:40:00Z', tot: '2026-03-03T21:20:00Z', kentering: '2026-03-03T21:00:00Z'},
+            {van: '2026-03-04T02:40:00Z', tot: '2026-03-04T03:20:00Z', kentering: '2026-03-04T03:10:00Z'},
+            {van: '2026-03-04T09:00:00Z', tot: '2026-03-04T09:40:00Z', kentering: '2026-03-04T09:20:00Z'},
+            {van: '2026-03-04T15:10:00Z', tot: '2026-03-04T15:50:00Z', kentering: '2026-03-04T15:40:00Z'},
+            {van: '2026-03-04T21:10:00Z', tot: '2026-03-04T21:50:00Z', kentering: '2026-03-04T21:40:00Z'},
+            {van: '2026-03-05T03:20:00Z', tot: '2026-03-05T04:00:00Z', kentering: '2026-03-05T03:50:00Z'},
+            {van: '2026-03-05T09:40:00Z', tot: '2026-03-05T10:20:00Z', kentering: '2026-03-05T10:00:00Z'},
+            {van: '2026-03-05T15:40:00Z', tot: '2026-03-05T16:30:00Z', kentering: '2026-03-05T16:10:00Z'},
+            {van: '2026-03-05T21:50:00Z', tot: '2026-03-05T22:30:00Z', kentering: '2026-03-05T22:10:00Z'},
+            {van: '2026-03-06T03:50:00Z', tot: '2026-03-06T04:40:00Z', kentering: '2026-03-06T04:20:00Z'},
+            {van: '2026-03-06T10:20:00Z', tot: '2026-03-06T10:50:00Z', kentering: '2026-03-06T10:40:00Z'},
         ])
     })
 
@@ -559,12 +561,9 @@ describe('getDuikvensters', () => {
             {timeStamp: '2026-03-04T11:00:00Z', value: 0.21},
         ]
 
-        expect(getDuikvensters(stromingsdata)).toEqual([
-            {
-                van: '2026-03-04T10:20:00Z',
-                tot: '2026-03-04T10:50:00Z',
-            },
-        ])
+        expect(
+            getDuikvensters(stromingsdata).map(({van, tot, kentering}) => ({van, tot, kentering}))
+        ).toEqual([])
     })
 
     it('keeps windows that cross midnight when duration is at least 30 minutes', () => {
@@ -577,10 +576,13 @@ describe('getDuikvensters', () => {
             {timeStamp: '2026-03-05T00:30:00Z', value: 0.24},
         ]
 
-        expect(getDuikvensters(stromingsdata)).toEqual([
+        expect(
+            getDuikvensters(stromingsdata).map(({van, tot, kentering}) => ({van, tot, kentering}))
+        ).toEqual([
             {
                 van: '2026-03-04T23:50:00Z',
                 tot: '2026-03-05T00:20:00Z',
+                kentering: '2026-03-05T00:10:00Z',
             },
         ])
     })
