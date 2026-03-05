@@ -18,6 +18,9 @@ if ! command -v tofu >/dev/null 2>&1; then
   exit 1
 fi
 
+echo "Running tests..."
+npm run test
+
 echo "Building frontend..."
 npm run build
 
