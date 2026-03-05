@@ -553,17 +553,23 @@ describe('getDuikvensters', () => {
             null,
             {value: 0.34},
             {timeStamp: '2026-03-04T10:00:00Z', value: 0.34},
-            {timeStamp: '2026-03-04T10:10:00Z', value: 'NaN'},
-            {timeStamp: '2026-03-04T10:20:00Z', value: 0.21},
-            {timeStamp: '2026-03-04T10:30:00Z', value: 0.19},
-            {timeStamp: '2026-03-04T10:40:00Z', value: 'NaN'},
-            {timeStamp: '2026-03-04T10:50:00Z', value: 0.18},
-            {timeStamp: '2026-03-04T11:00:00Z', value: 0.21},
+            {timeStamp: '2026-03-04T11:10:00Z', value: 'NaN'},
+            {timeStamp: '2026-03-04T12:20:00Z', value: 0.21},
+            {timeStamp: '2026-03-04T13:30:00Z', value: 0.19},
+            {timeStamp: '2026-03-04T14:40:00Z', value: 'NaN'},
+            {timeStamp: '2026-03-04T15:50:00Z', value: 0.18},
+            {timeStamp: '2026-03-04T16:00:00Z', value: 0.21},
         ]
 
         expect(
             getDuikvensters(stromingsdata).map(({van, tot, kentering}) => ({van, tot, kentering}))
-        ).toEqual([])
+        ).toEqual([
+            {
+                van: '2026-03-04T13:30:00Z',
+                tot: '2026-03-04T15:50:00Z',
+                kentering: '2026-03-04T15:50:00Z',
+            },
+        ])
     })
 
     it('keeps windows that cross midnight when duration is at least 30 minutes', () => {
