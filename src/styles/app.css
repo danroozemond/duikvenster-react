@@ -214,6 +214,11 @@ body {
   padding: 0.65rem 1rem;
 }
 
+.duikvensters-table tr.duikvenster-row-past td {
+  color: rgba(89, 112, 143, 0.55);
+  font-weight: 300;
+}
+
 .duikvensters-card {
   padding: clamp(1.5rem, 3vw, 2.25rem);
 }

@@ -92,7 +92,8 @@ describe('stromingChartTime', () => {
     const valueMs = new Date(2026, 2, 4, 6, 5, 0).getTime()
     const formatted = formatLocalAxisDateTime(valueMs)
 
-    expect(formatted).toMatch(/^[A-Za-z]{3} \d{2}, \d{2}u$/)
+    // Locale-dependent: Dutch short weekday names may include dots (e.g. "wo.").
+    expect(formatted).toMatch(/^[\p{L}.]{2,4} \d{2}, \d{2}u$/u)
   })
 
   it('formats tooltip label with full local date and time', () => {

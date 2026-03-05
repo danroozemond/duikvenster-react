@@ -1,3 +1,5 @@
+import { APP_LOCALE } from './locale'
+
 export type SixHourAxisBounds = {
   min: number
   max: number
@@ -15,14 +17,14 @@ const SIX_HOURS_MS = 6 * 60 * 60 * 1000
 
 export function formatLocalAxisDateTime(valueMs: number): string {
   const date = new Date(valueMs)
-  const weekday = new Intl.DateTimeFormat('en-GB', {
+  const weekday = new Intl.DateTimeFormat(APP_LOCALE, {
     weekday: 'short',
   }).format(date)
-  const day = new Intl.DateTimeFormat('en-GB', {
+  const day = new Intl.DateTimeFormat(APP_LOCALE, {
     day: '2-digit',
   })
     .format(date)
-  const hour = new Intl.DateTimeFormat('en-GB', {
+  const hour = new Intl.DateTimeFormat(APP_LOCALE, {
     hour: '2-digit',
     hour12: false,
   }).format(date)
@@ -31,7 +33,7 @@ export function formatLocalAxisDateTime(valueMs: number): string {
 }
 
 export function formatLocalTooltipDateTime(valueMs: number): string {
-  return new Intl.DateTimeFormat('nl-NL', {
+  return new Intl.DateTimeFormat(APP_LOCALE, {
     weekday: 'short',
     day: '2-digit',
     month: '2-digit',
