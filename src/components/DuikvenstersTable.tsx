@@ -51,8 +51,8 @@ function DuikvenstersTable({ events, badgeLabel }: Props) {
             <tr>
               <th scope="col">Datum</th>
               <th scope="col">Van</th>
-              <th scope="col">Tot</th>
               <th scope="col">Kentering</th>
+              <th scope="col">Tot</th>
             </tr>
           </thead>
           <tbody>
@@ -72,8 +72,8 @@ function DuikvenstersTable({ events, badgeLabel }: Props) {
                   >
                     <td>{showDate ? currentDate : ''}</td>
                     <td>{formatTimeLocal(duikvenster.van)}</td>
-                    <td>{formatTimeLocal(duikvenster.tot)}</td>
                     <td>{formatTimeLocal(duikvenster.kentering)}</td>
+                    <td>{formatTimeLocal(duikvenster.tot)}</td>
                   </tr>
                 )
               })
