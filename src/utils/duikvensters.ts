@@ -8,12 +8,20 @@ export class Duikvenster {
   tot: string
   kentering: string
   kentering_value: number
+  kentering_type: string
 
-  constructor(van: string, tot: string, kentering: string, kenteringValue: number) {
+  constructor(
+    van: string,
+    tot: string,
+    kentering: string,
+    kenteringValue: number,
+    kenteringType: string = '',
+  ) {
     this.van = van
     this.tot = tot
     this.kentering = kentering
     this.kentering_value = kenteringValue
+    this.kentering_type = kenteringType
   }
 
   hasMinimumDuration(): boolean {
@@ -45,7 +53,7 @@ export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
           se.timestamp,
           se.timestamp,
           se.timestamp,
-          se.value,
+          se.value
         )
       }
       // open/extend end of window
