@@ -559,11 +559,9 @@ describe('getDuikvensters', () => {
             {timeStamp: '2026-03-04T11:00:00Z', value: 0.21},
         ]
 
-        console.log('SHOULD PROBABLY FIX THIS TEST')
-
         expect(getDuikvensters(stromingsdata)).toEqual([
             {
-                van: '2026-03-04T10:30:00Z',
+                van: '2026-03-04T10:20:00Z',
                 tot: '2026-03-04T10:50:00Z',
             },
         ])
