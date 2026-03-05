@@ -150,6 +150,41 @@ async function fetchEventsFromUrl(url: string): Promise<unknown[]> {
   return events
 }
 
+function mergeEventsWithRichting(
+  events: unknown[],
+  eventsRichting: unknown[],
+): unknown[] {
+  const richtingByTimestamp = new Map<string, unknown>()
+  for (const event of eventsRichting) {
+    if (typeof event !== 'object' || event === null) {
+      continue
+    }
+
+    const timestamp = (event as { timeStamp?: unknown }).timeStamp
+    if (typeof timestamp !== 'string' || timestamp.trim() === '') {
+      continue
+    }
+
+    richtingByTimestamp.set(timestamp, (event as { value?: unknown }).value)
+  }
+
+  return events.map((event) => {
+    if (typeof event !== 'object' || event === null) {
+      return event
+    }
+
+    const timestamp = (event as { timeStamp?: unknown }).timeStamp
+    if (typeof timestamp !== 'string' || !richtingByTimestamp.has(timestamp)) {
+      return event
+    }
+
+    return {
+      ...(event as Record<string, unknown>),
+      richting: richtingByTimestamp.get(timestamp),
+    }
+  })
+}
+
 export async function fetchStromingsdata(
   siteId: string,
   dateFrom?: DateInput,
@@ -183,10 +218,11 @@ export async function fetchStromingsdata(
       normalizedDateTimeTo,
   )
 
-  const events = await fetchEventsFromUrl(url_stroming)
-  const events_richting = await fetchEventsFromUrl(url_richting)
-
-  console.log(events_richting)
+  const [events, events_richting] = await Promise.all([
+    fetchEventsFromUrl(url_stroming),
+    fetchEventsFromUrl(url_richting),
+  ])
+  const mergedEvents = mergeEventsWithRichting(events, events_richting)
 
   window.localStorage.setItem(
     STROMINGSDATA_STORAGE_KEY,
@@ -194,8 +230,9 @@ export async function fetchStromingsdata(
       siteId,
       dateTimeFrom: normalizedDateTimeFrom,
       dateTimeTo: normalizedDateTimeTo,
-      events,
+      events: mergedEvents,
     }),
   )
-  return events
+
+  return mergedEvents
 }
