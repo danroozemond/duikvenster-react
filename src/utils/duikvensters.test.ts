@@ -529,7 +529,7 @@ describe('getDuikvensters', () => {
             ]
 
         expect(
-            getDuikvensters(stromingsdata).map(({van, tot, kentering}) => ({van, tot, kentering}))
+            getDuikvensters(stromingsdata).map(({van, tot, kentering, kentering_type}) => ({van, tot, kentering, kentering_type}))
         ).toEqual([
             {van: '2026-03-04T02:40:00Z', tot: '2026-03-04T03:20:00Z', kentering: '2026-03-04T03:10:00Z', kentering_type: 'HW'},
             {van: '2026-03-04T09:00:00Z', tot: '2026-03-04T09:40:00Z', kentering: '2026-03-04T09:20:00Z', kentering_type: 'LW'},
@@ -562,7 +562,7 @@ describe('getDuikvensters', () => {
         ]
 
         expect(
-            getDuikvensters(stromingsdata).map(({van, tot, kentering}) => ({van, tot, kentering}))
+            getDuikvensters(stromingsdata).map(({van, tot, kentering, kentering_type}) => ({van, tot, kentering, kentering_type}))
         ).toEqual([
             {
                 van: '2026-03-04T13:30:00Z',
@@ -583,7 +583,7 @@ describe('getDuikvensters', () => {
         ]
 
         expect(
-            getDuikvensters(stromingsdata).map(({van, tot, kentering}) => ({van, tot, kentering}))
+            getDuikvensters(stromingsdata).map(({van, tot, kentering, kentering_type}) => ({van, tot, kentering, kentering_type}))
         ).toEqual([
             {
                 van: '2026-03-04T23:50:00Z',
