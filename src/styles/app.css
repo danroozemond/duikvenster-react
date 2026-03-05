@@ -225,6 +225,11 @@ body {
   padding: clamp(1.5rem, 3vw, 2.25rem);
 }
 
+.duikvensters-toggle {
+  display: inline-flex;
+  align-items: center;
+}
+
 @media (min-width: 992px) {
   .app-navbar-container {
     justify-content: flex-start;

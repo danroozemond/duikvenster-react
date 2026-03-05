@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react'
 import { getDuikvensters } from '../utils/duikvensters'
 import { APP_LOCALE } from '../utils/locale'
 
@@ -37,7 +38,34 @@ function formatDateLocal(value: string): string {
 }
 
 function DuikvenstersTable({ events, badgeLabel }: Props) {
-  const duikvensters = getDuikvensters(events)
+  const duikvensters = useMemo(() => getDuikvensters(events), [events])
+  const processedRows = useMemo(
+    () =>
+      duikvensters.map((duikvenster, index) => {
+        const vanDate = toDate(duikvenster.van)
+        return {
+          duikvenster,
+          index,
+          dateLabel: formatDateLocal(duikvenster.van),
+          isPast: vanDate !== null && vanDate.getTime() < Date.now(),
+        }
+      }),
+    [duikvensters],
+  )
+  const firstUpcomingIndex = processedRows.findIndex((row) => !row.isPast)
+  const pastRowsAtTop =
+    firstUpcomingIndex === -1 ? processedRows.length : firstUpcomingIndex
+  const hasCollapsiblePastRows =
+    pastRowsAtTop > 0 && pastRowsAtTop < processedRows.length
+  const [showPastRows, setShowPastRows] = useState(!hasCollapsiblePastRows)
+
+  useEffect(() => {
+    setShowPastRows(!hasCollapsiblePastRows)
+  }, [hasCollapsiblePastRows, pastRowsAtTop, processedRows.length])
+
+  const visibleRows = showPastRows
+    ? processedRows
+    : processedRows.slice(pastRowsAtTop)
 
   return (
     <section className="chart-card duikvensters-card mt-4">
@@ -56,24 +84,21 @@ function DuikvenstersTable({ events, badgeLabel }: Props) {
             </tr>
           </thead>
           <tbody>
-            {duikvensters.length > 0 ? (
-              duikvensters.map((duikvenster, index) => {
-                const currentDate = formatDateLocal(duikvenster.van)
+            {visibleRows.length > 0 ? (
+              visibleRows.map((row, rowIndex) => {
                 const previousDate =
-                  index > 0 ? formatDateLocal(duikvensters[index - 1].van) : null
-                const showDate = currentDate !== previousDate
-                const vanDate = toDate(duikvenster.van)
-                const isPast = vanDate !== null && vanDate.getTime() < Date.now()
+                  rowIndex > 0 ? visibleRows[rowIndex - 1].dateLabel : null
+                const showDate = row.dateLabel !== previousDate
 
                 return (
                   <tr
-                    key={`${duikvenster.van}-${duikvenster.tot}-${index}`}
-                    className={isPast ? 'duikvenster-row-past' : undefined}
+                    key={`${row.duikvenster.van}-${row.duikvenster.tot}-${row.index}`}
+                    className={row.isPast ? 'duikvenster-row-past' : undefined}
                   >
-                    <td>{showDate ? currentDate : ''}</td>
-                    <td>{formatTimeLocal(duikvenster.van)}</td>
-                    <td>{formatTimeLocal(duikvenster.kentering)}</td>
-                    <td>{formatTimeLocal(duikvenster.tot)}</td>
+                    <td>{showDate ? row.dateLabel : ''}</td>
+                    <td>{formatTimeLocal(row.duikvenster.van)}</td>
+                    <td>{formatTimeLocal(row.duikvenster.kentering)}</td>
+                    <td>{formatTimeLocal(row.duikvenster.tot)}</td>
                   </tr>
                 )
               })
@@ -87,6 +112,19 @@ function DuikvenstersTable({ events, badgeLabel }: Props) {
           </tbody>
         </table>
       </div>
+      {hasCollapsiblePastRows ? (
+          <button
+              type="button"
+              className="btn btn-sm btn-outline-secondary duikvensters-toggle mt-3"
+              onClick={() => {
+                setShowPastRows((current) => !current)
+              }}
+          >
+            {showPastRows
+                ? `Verberg ${pastRowsAtTop} verlopen vensters`
+                : `Toon ${pastRowsAtTop} verlopen vensters`}
+          </button>
+      ) : null}
     </section>
   )
 }
