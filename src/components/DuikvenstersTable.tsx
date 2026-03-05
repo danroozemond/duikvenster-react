@@ -11,20 +11,7 @@ function toDate(value: string): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed
 }
 
-function formatVanLocal(value: string): string {
-  const date = toDate(value)
-  if (date === null) {
-    return value
-  }
-
-  return date.toLocaleString(APP_LOCALE, {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  })
-}
-
-function formatTotLocal(value: string): string {
+function formatTimeLocal(value: string): string {
   const date = toDate(value)
   if (date === null) {
     return value
@@ -65,6 +52,7 @@ function DuikvenstersTable({ events, badgeLabel }: Props) {
               <th scope="col">Datum</th>
               <th scope="col">Van</th>
               <th scope="col">Tot</th>
+              <th scope="col">Kentering</th>
             </tr>
           </thead>
           <tbody>
@@ -83,14 +71,15 @@ function DuikvenstersTable({ events, badgeLabel }: Props) {
                     className={isPast ? 'duikvenster-row-past' : undefined}
                   >
                     <td>{showDate ? currentDate : ''}</td>
-                    <td>{formatVanLocal(duikvenster.van)}</td>
-                    <td>{formatTotLocal(duikvenster.tot)}</td>
+                    <td>{formatTimeLocal(duikvenster.van)}</td>
+                    <td>{formatTimeLocal(duikvenster.tot)}</td>
+                    <td>{formatTimeLocal(duikvenster.kentering)}</td>
                   </tr>
                 )
               })
             ) : (
               <tr>
-                <td colSpan={3} className="text-center text-muted py-3">
+                <td colSpan={4} className="text-center text-muted py-3">
                   Geen duikvensters beschikbaar.
                 </td>
               </tr>
