@@ -28,6 +28,10 @@ type XAxisRange = {
 
 const STROMING_CHART_ID = 'stroming-line-chart'
 const ZOOM_TOLERANCE_MS = 1_000
+const MOBILE_MEDIA_QUERY = '(max-width: 991.98px)'
+const SIX_HOURS_MS = 6 * 60 * 60 * 1000
+const MOBILE_DEFAULT_PAST_WINDOW_MS = SIX_HOURS_MS
+const MOBILE_DEFAULT_FUTURE_WINDOW_MS = 24 * 60 * 60 * 1000
 
 function stripTrailingZeroValues(points: ApexPoint[]): ApexPoint[] {
   let endIndex = points.length
@@ -53,6 +57,39 @@ function isZoomedRange(
 
 function StromingLineChart({ events }: Props) {
   const [isZoomed, setIsZoomed] = useState(false)
+  const [isChartMounted, setIsChartMounted] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false
+    }
+
+    return window.matchMedia(MOBILE_MEDIA_QUERY).matches
+  })
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const mediaQuery = window.matchMedia(MOBILE_MEDIA_QUERY)
+    const onChange = (event: MediaQueryListEvent) => {
+      setIsMobile(event.matches)
+    }
+
+    setIsMobile(mediaQuery.matches)
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', onChange)
+      return () => {
+        mediaQuery.removeEventListener('change', onChange)
+      }
+    }
+
+    mediaQuery.addListener(onChange)
+    return () => {
+      mediaQuery.removeListener(onChange)
+    }
+  }, [])
 
   const points = useMemo<ApexPoint[]>(() => {
     const mappedPoints = events
@@ -83,7 +120,26 @@ function StromingLineChart({ events }: Props) {
   )
 
   const timestamps = useMemo(() => points.map((point) => point.x), [points])
-  const axisBounds = useMemo(() => buildSixHourAxisBounds(timestamps), [timestamps])
+  const fullAxisBounds = useMemo(() => buildSixHourAxisBounds(timestamps), [timestamps])
+  const defaultAxisBounds = useMemo(() => {
+    if (!fullAxisBounds) {
+      return null
+    }
+
+    if (!isMobile) {
+      return fullAxisBounds
+    }
+
+    const nowMs = Date.now()
+    const min = nowMs - MOBILE_DEFAULT_PAST_WINDOW_MS
+    const max = nowMs + MOBILE_DEFAULT_FUTURE_WINDOW_MS
+
+    return {
+      min,
+      max,
+      tickAmount: Math.max(1, Math.floor((max - min) / SIX_HOURS_MS)),
+    }
+  }, [fullAxisBounds, isMobile])
   const xAxisAnnotations = useMemo(
     () => buildSixHourAnnotations(timestamps),
     [timestamps],
@@ -102,30 +158,43 @@ function StromingLineChart({ events }: Props) {
         },
       },
     }),
-    [axisBounds?.min, axisBounds?.max],
+    [defaultAxisBounds?.min, defaultAxisBounds?.max],
   )
 
   useEffect(() => {
     setIsZoomed(false)
-  }, [axisBounds?.min, axisBounds?.max])
+  }, [defaultAxisBounds?.min, defaultAxisBounds?.max])
+
+  useEffect(() => {
+    if (!isChartMounted || !isMobile || !defaultAxisBounds || !fullAxisBounds) {
+      return
+    }
+
+    void ApexCharts.exec(
+      STROMING_CHART_ID,
+      'zoomX',
+      defaultAxisBounds.min,
+      defaultAxisBounds.max,
+    )
+  }, [defaultAxisBounds, fullAxisBounds, isChartMounted, isMobile])
 
   const handleViewportChange = useCallback(
     (xaxis?: XAxisRange) => {
-      if (!axisBounds) {
+      if (!defaultAxisBounds) {
         setIsZoomed(false)
         return
       }
 
       setIsZoomed(
         isZoomedRange(
-          xaxis?.min ?? axisBounds.min,
-          xaxis?.max ?? axisBounds.max,
-          axisBounds.min,
-          axisBounds.max,
+          xaxis?.min ?? defaultAxisBounds.min,
+          xaxis?.max ?? defaultAxisBounds.max,
+          fullAxisBounds.min,
+          fullAxisBounds.max,
         ),
       )
     },
-    [axisBounds],
+    [defaultAxisBounds],
   )
 
   const options = useMemo<ApexOptions>(
@@ -135,6 +204,9 @@ function StromingLineChart({ events }: Props) {
         type: 'line',
         toolbar: { show: false },
         events: {
+          mounted: () => {
+            setIsChartMounted(true)
+          },
           zoomed: (_, { xaxis }) => {
             handleViewportChange(xaxis)
           },
@@ -149,9 +221,9 @@ function StromingLineChart({ events }: Props) {
       },
       xaxis: {
         type: 'datetime',
-        min: axisBounds?.min,
-        max: axisBounds?.max,
-        tickAmount: axisBounds?.tickAmount,
+        min: fullAxisBounds?.min,
+        max: fullAxisBounds?.max,
+        tickAmount: fullAxisBounds?.tickAmount,
         labels: {
           datetimeUTC: false,
           formatter: (_, timestamp) => {
@@ -200,21 +272,21 @@ function StromingLineChart({ events }: Props) {
         text: 'Geen data beschikbaar.',
       },
     }),
-    [axisBounds, nowAnnotation, points, xAxisAnnotations],
+    [fullAxisBounds, nowAnnotation, points, xAxisAnnotations],
   )
 
   const resetZoom = useCallback(() => {
-    if (!axisBounds) {
+    if (!defaultAxisBounds) {
       return
     }
 
     void ApexCharts.exec(
       STROMING_CHART_ID,
       'zoomX',
-      axisBounds.min,
-      axisBounds.max,
+      fullAxisBounds!.min,
+      fullAxisBounds!.max,
     )
-  }, [axisBounds])
+  }, [fullAxisBounds])
 
   return (
     <Suspense fallback={<p className="mb-0">Chart wordt geladen...</p>}>
@@ -225,7 +297,7 @@ function StromingLineChart({ events }: Props) {
               type="button"
               className="btn btn-outline-secondary btn-sm"
               onClick={resetZoom}
-              disabled={axisBounds === null}
+              disabled={defaultAxisBounds === null}
               aria-label="Reset zoom"
               title="Reset zoom"
             >
