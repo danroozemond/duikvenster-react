@@ -3,6 +3,16 @@ export const STROMINGSDATA_STORAGE_KEY = 'duikvenster.stromingsdata.latest'
 export const STROMINGSDATA_URL_TEMPLATE =
   'https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG_SOF_6.1.ms&sourceName=compute&locationCode={siteId}&startTime={dateTimeFrom}&endTime={dateTimeTo}'
 
+// note voorbeeld stroomsnelheid
+// https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG_SOF_6.1.ms&sourceName=compute&locationCode=znp2&startTime=2026-03-03T23%3A00%3A00Z&endTime=2026-03-07T22%3A59%3A59Z
+
+// note voorbeeld richting
+// https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG.2&sourceName=SOF_6&locationCode=znp2&startTime=2026-03-03T23%3A00%3A00Z&endTime=2026-03-07T22%3A59%3A59Z
+
+// note voorbeeld waterhoogte, dit zijn andere locaties
+// https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=WT&sourceName=h_6&locationCode=zn&startTime=2026-03-03T23%3A00%3A00Z&endTime=2026-03-07T22%3A59%3A59Z
+
+
 type DateInput = Date | string
 
 function padNumber(value: number): string {
