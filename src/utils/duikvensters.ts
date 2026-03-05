@@ -5,21 +5,37 @@ export type Duikvenster = {
   tot: string
 }
 
+const DUIKVENSTER_THRESHOLD = 0.2 //=20 cm/s, suggested by NOB
+
 export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
-  // Logic to derive "van/tot" windows
-  const orderedData:StromingEvent[] = stromingsdata
+  const orderedData: StromingEvent[] = stromingsdata
     .map(toStromingEvent)
     .filter((event): event is StromingEvent => event !== null)
-    .sort()
+    .sort(
+      (left, right) =>
+        new Date(left.timestamp).getTime() - new Date(right.timestamp).getTime(),
+    )
 
   const windows: Duikvenster[] = []
+  let currentVan: string | null = null
+  let currentTot: string | null = null
 
-  orderedData.forEach(strev => {
-    windows.push({
-      van: strev.timestamp,
-      tot: strev.timestamp
-    })
-  })
+  for (const se of orderedData) {
+    if (se.value <= DUIKVENSTER_THRESHOLD) {
+      // open new window, or extend existing window
+      if (currentVan === null) {
+        currentVan = se.timestamp
+      }
+      currentTot = se.timestamp
+    } else if (currentVan !== null && currentTot !== null) {
+      // close window (and store)
+      windows.push({ van: currentVan, tot: currentTot })
+      currentVan = null
+      currentTot = null
+    }
+  }
+
+  // windows at the end of the horizon are ignored on purpose
 
   return windows
 }
