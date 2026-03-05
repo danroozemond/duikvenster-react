@@ -16,16 +16,11 @@ function formatVanLocal(value: string): string {
     return value
   }
 
-  const weekday = date.toLocaleString('en-US', { weekday: 'short' })
-  const month = date.toLocaleString('en-US', { month: 'short' })
-  const day = date.toLocaleString('en-US', { day: '2-digit' })
-  const time = date.toLocaleString('en-US', {
+  return date.toLocaleString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
   })
-
-  return `${weekday} ${month} ${day}, ${time}`
 }
 
 function formatTotLocal(value: string): string {
@@ -41,6 +36,18 @@ function formatTotLocal(value: string): string {
   })
 }
 
+function formatDateLocal(value: string): string {
+  const date = toDate(value)
+  if (date === null) {
+    return value
+  }
+
+  const weekday = date.toLocaleString('en-US', { weekday: 'short' })
+  const month = date.toLocaleString('en-US', { month: 'short' })
+  const day = date.toLocaleString('en-US', { day: '2-digit' })
+  return `${weekday} ${month} ${day}`
+}
+
 function DuikvenstersTable({ events, badgeLabel }: Props) {
   const duikvensters = getDuikvensters(events)
 
@@ -54,21 +61,30 @@ function DuikvenstersTable({ events, badgeLabel }: Props) {
         <table className="table table-sm mb-0 duikvensters-table">
           <thead>
             <tr>
+              <th scope="col">Datum</th>
               <th scope="col">Van</th>
               <th scope="col">Tot</th>
             </tr>
           </thead>
           <tbody>
             {duikvensters.length > 0 ? (
-              duikvensters.map((duikvenster, index) => (
-                <tr key={`${duikvenster.van}-${duikvenster.tot}-${index}`}>
-                  <td>{formatVanLocal(duikvenster.van)}</td>
-                  <td>{formatTotLocal(duikvenster.tot)}</td>
-                </tr>
-              ))
+              duikvensters.map((duikvenster, index) => {
+                const currentDate = formatDateLocal(duikvenster.van)
+                const previousDate =
+                  index > 0 ? formatDateLocal(duikvensters[index - 1].van) : null
+                const showDate = currentDate !== previousDate
+
+                return (
+                  <tr key={`${duikvenster.van}-${duikvenster.tot}-${index}`}>
+                    <td>{showDate ? currentDate : ''}</td>
+                    <td>{formatVanLocal(duikvenster.van)}</td>
+                    <td>{formatTotLocal(duikvenster.tot)}</td>
+                  </tr>
+                )
+              })
             ) : (
               <tr>
-                <td colSpan={2} className="text-center text-muted py-3">
+                <td colSpan={3} className="text-center text-muted py-3">
                   Geen duikvensters beschikbaar.
                 </td>
               </tr>
