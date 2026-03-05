@@ -11,10 +11,7 @@ export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
   const orderedData: StromingEvent[] = stromingsdata
     .map(toStromingEvent)
     .filter((event): event is StromingEvent => event !== null)
-    .sort(
-      (left, right) =>
-        new Date(left.timestamp).getTime() - new Date(right.timestamp).getTime(),
-    )
+    .sort((left, right) => left.timestamp.localeCompare(right.timestamp))
 
   const windows: Duikvenster[] = []
   let currentVan: string | null = null
