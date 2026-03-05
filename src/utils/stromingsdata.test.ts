@@ -45,7 +45,7 @@ describe('fetchStromingsdata', () => {
     expect(vi.isMockFunction(fetch)).toBe(true)
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining(
-        `locationCode=zeeheks&&startTime=${encodeURIComponent(
+        `locationCode=zeeheks&startTime=${encodeURIComponent(
           expectedDateTimeFrom,
         )}&endTime=${encodeURIComponent(expectedDateTimeTo)}`,
       ),
