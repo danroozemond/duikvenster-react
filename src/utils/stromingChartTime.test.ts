@@ -92,6 +92,7 @@ describe('stromingChartTime', () => {
     const valueMs = new Date(2026, 2, 4, 6, 5, 0).getTime()
     const formatted = formatLocalAxisDateTime(valueMs)
 
+    // Locale-dependent: Dutch short weekday names may include dots (e.g. "wo.").
     expect(formatted).toMatch(/^[\p{L}.]{2,4} \d{2}, \d{2}u$/u)
   })
 

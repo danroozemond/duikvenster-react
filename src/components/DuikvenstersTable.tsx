@@ -1,4 +1,5 @@
 import { getDuikvensters } from '../utils/duikvensters'
+import { APP_LOCALE } from '../utils/locale'
 
 type Props = {
   events: unknown[]
@@ -16,7 +17,7 @@ function formatVanLocal(value: string): string {
     return value
   }
 
-  return date.toLocaleString('nl-NL', {
+  return date.toLocaleString(APP_LOCALE, {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
@@ -29,7 +30,7 @@ function formatTotLocal(value: string): string {
     return value
   }
 
-  return date.toLocaleString('nl-NL', {
+  return date.toLocaleString(APP_LOCALE, {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
@@ -42,9 +43,9 @@ function formatDateLocal(value: string): string {
     return value
   }
 
-  const weekday = date.toLocaleString('nl-NL', { weekday: 'short' })
-  const month = date.toLocaleString('nl-NL', { month: 'short' })
-  const day = date.toLocaleString('nl-NL', { day: '2-digit' })
+  const weekday = date.toLocaleString(APP_LOCALE, { weekday: 'short' })
+  const month = date.toLocaleString(APP_LOCALE, { month: 'short' })
+  const day = date.toLocaleString(APP_LOCALE, { day: '2-digit' })
   return `${weekday} ${month} ${day}`
 }
 
