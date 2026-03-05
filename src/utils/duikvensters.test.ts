@@ -568,4 +568,22 @@ describe('getDuikvensters', () => {
             },
         ])
     })
+
+    it('keeps windows that cross midnight when duration is at least 30 minutes', () => {
+        const stromingsdata = [
+            {timeStamp: '2026-03-04T23:40:00Z', value: 0.24},
+            {timeStamp: '2026-03-04T23:50:00Z', value: 0.19},
+            {timeStamp: '2026-03-05T00:00:00Z', value: 0.18},
+            {timeStamp: '2026-03-05T00:10:00Z', value: 0.17},
+            {timeStamp: '2026-03-05T00:20:00Z', value: 0.18},
+            {timeStamp: '2026-03-05T00:30:00Z', value: 0.24},
+        ]
+
+        expect(getDuikvensters(stromingsdata)).toEqual([
+            {
+                van: '2026-03-04T23:50:00Z',
+                tot: '2026-03-05T00:20:00Z',
+            },
+        ])
+    })
 })
