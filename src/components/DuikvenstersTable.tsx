@@ -16,7 +16,7 @@ function formatVanLocal(value: string): string {
     return value
   }
 
-  return date.toLocaleString('en-US', {
+  return date.toLocaleString('nl-NL', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
@@ -29,7 +29,7 @@ function formatTotLocal(value: string): string {
     return value
   }
 
-  return date.toLocaleString('en-US', {
+  return date.toLocaleString('nl-NL', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
@@ -42,9 +42,9 @@ function formatDateLocal(value: string): string {
     return value
   }
 
-  const weekday = date.toLocaleString('en-US', { weekday: 'short' })
-  const month = date.toLocaleString('en-US', { month: 'short' })
-  const day = date.toLocaleString('en-US', { day: '2-digit' })
+  const weekday = date.toLocaleString('nl-NL', { weekday: 'short' })
+  const month = date.toLocaleString('nl-NL', { month: 'short' })
+  const day = date.toLocaleString('nl-NL', { day: '2-digit' })
   return `${weekday} ${month} ${day}`
 }
 
