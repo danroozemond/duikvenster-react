@@ -1,7 +1,11 @@
 export const STROMINGSDATA_STORAGE_KEY = 'duikvenster.stromingsdata.latest'
 
 export const STROMINGSDATA_URL_TEMPLATE =
-  'https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG_SOF_6.1.ms&sourceName=compute&locationCode={siteId}&startTime={dateTimeFrom}&endTime={dateTimeTo}'
+    'https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG_SOF_6.1.ms&sourceName=compute&locationCode={siteId}&startTime={dateTimeFrom}&endTime={dateTimeTo}'
+
+export const STROMINGSRICHTING_URL_TEMPLATE =
+    'https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG.2&sourceName=SOF_6&locationCode={siteId}&startTime={dateTimeFrom}&endTime={dateTimeTo}'
+
 
 // note voorbeeld stroomsnelheid
 // https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG_SOF_6.1.ms&sourceName=compute&locationCode=znp2&startTime=2026-03-03T23%3A00%3A00Z&endTime=2026-03-07T22%3A59%3A59Z
@@ -114,32 +118,7 @@ export function buildStromingsdataUrl(
     .replace('{dateTimeTo}', encodeURIComponent(dateTimeTo))
 }
 
-export async function fetchStromingsdata(
-  siteId: string,
-  dateFrom?: DateInput,
-  dateTo?: DateInput,
-): Promise<unknown[]> {
-  if (siteId.trim() === '') {
-    throw new Error('siteId is required')
-  }
-
-  const normalizedDateFrom = resolveDateInput(dateFrom, getDefaultDateFrom())
-  const normalizedDateTo = resolveDateInput(dateTo, getDefaultDateTo())
-  const normalizedDateTimeFrom = toUtcDateTimeFromLocalDate(
-    normalizedDateFrom,
-    'start',
-  )
-  const normalizedDateTimeTo = toUtcDateTimeFromLocalDate(
-    normalizedDateTo,
-    'end',
-  )
-
-  const url = buildStromingsdataUrl(
-    STROMINGSDATA_URL_TEMPLATE,
-    siteId,
-    normalizedDateTimeFrom,
-    normalizedDateTimeTo,
-  )
+async function fetchEventsFromUrl(url: string): Promise<unknown[]> {
   let events: unknown[] = []
 
   try {
@@ -167,6 +146,47 @@ export async function fetchStromingsdata(
   } catch {
     events = []
   }
+
+  return events
+}
+
+export async function fetchStromingsdata(
+  siteId: string,
+  dateFrom?: DateInput,
+  dateTo?: DateInput,
+): Promise<unknown[]> {
+  if (siteId.trim() === '') {
+    throw new Error('siteId is required')
+  }
+
+  const normalizedDateFrom = resolveDateInput(dateFrom, getDefaultDateFrom())
+  const normalizedDateTo = resolveDateInput(dateTo, getDefaultDateTo())
+  const normalizedDateTimeFrom = toUtcDateTimeFromLocalDate(
+    normalizedDateFrom,
+    'start',
+  )
+  const normalizedDateTimeTo = toUtcDateTimeFromLocalDate(
+    normalizedDateTo,
+    'end',
+  )
+
+  const url_stroming = buildStromingsdataUrl(
+      STROMINGSDATA_URL_TEMPLATE,
+      siteId,
+      normalizedDateTimeFrom,
+      normalizedDateTimeTo,
+  )
+  const url_richting = buildStromingsdataUrl(
+      STROMINGSRICHTING_URL_TEMPLATE,
+      siteId,
+      normalizedDateTimeFrom,
+      normalizedDateTimeTo,
+  )
+
+  const events = await fetchEventsFromUrl(url_stroming)
+  const events_richting = await fetchEventsFromUrl(url_richting)
+
+  console.log(events_richting)
 
   window.localStorage.setItem(
     STROMINGSDATA_STORAGE_KEY,
