@@ -74,9 +74,14 @@ function DuikvenstersTable({ events, badgeLabel }: Props) {
                 const previousDate =
                   index > 0 ? formatDateLocal(duikvensters[index - 1].van) : null
                 const showDate = currentDate !== previousDate
+                const vanDate = toDate(duikvenster.van)
+                const isPast = vanDate !== null && vanDate.getTime() < Date.now()
 
                 return (
-                  <tr key={`${duikvenster.van}-${duikvenster.tot}-${index}`}>
+                  <tr
+                    key={`${duikvenster.van}-${duikvenster.tot}-${index}`}
+                    className={isPast ? 'duikvenster-row-past' : undefined}
+                  >
                     <td>{showDate ? currentDate : ''}</td>
                     <td>{formatVanLocal(duikvenster.van)}</td>
                     <td>{formatTotLocal(duikvenster.tot)}</td>
