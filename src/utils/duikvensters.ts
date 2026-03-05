@@ -10,15 +10,17 @@ export type Duikvenster = {
 const DUIKVENSTER_THRESHOLD = 0.2 //=20 cm/s, suggested by NOB
 const MIN_DUIKVENSTER_DURATION_MS = 30 * 60 * 1000
 
-function hasMinimumDuration(window: Duikvenster): boolean {
-  const fromMs = new Date(window.van).getTime()
-  const toMs = new Date(window.tot).getTime()
+export const Duikvenster = {
+  hasMinimumDuration(window: Duikvenster): boolean {
+    const fromMs = new Date(window.van).getTime()
+    const toMs = new Date(window.tot).getTime()
 
-  if (!Number.isFinite(fromMs) || !Number.isFinite(toMs)) {
-    return false
-  }
+    if (!Number.isFinite(fromMs) || !Number.isFinite(toMs)) {
+      return false
+    }
 
-  return toMs - fromMs >= MIN_DUIKVENSTER_DURATION_MS
+    return toMs - fromMs >= MIN_DUIKVENSTER_DURATION_MS
+  },
 }
 
 export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
@@ -46,7 +48,7 @@ export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
       }
     } else if (currentWindow !== null) {
       // close window (and store)
-      if (hasMinimumDuration(currentWindow)) {
+      if (Duikvenster.hasMinimumDuration(currentWindow)) {
         windows.push(currentWindow)
       }
       currentWindow = null
