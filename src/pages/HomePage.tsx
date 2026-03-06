@@ -78,6 +78,10 @@ function HomePage() {
 
   const selectedSiteName =
     selectedSiteId === '' ? '' : diveSitesRecord[selectedSiteId]
+  const rwsStromingUrl =
+    selectedSiteId === ''
+      ? '#'
+      : `https://rwsos.rws.nl/viewer/embed/chart/oosterschelde/stroming/location/${encodeURIComponent(selectedSiteId)}?pd=-1%3B2&timeslider&theme=light&components=current-maps2d`
 
   return (
     <div className="app-shell">
@@ -131,9 +135,15 @@ function HomePage() {
             </a>
             <a
               className="btn btn-outline-primary"
-              href="https://rwsos.rws.nl/viewer/embed/chart/oosterschelde/stroming/location/znp2?pd=-1%3B2&timeslider&theme=light&components=current-maps2d"
+              href={rwsStromingUrl}
               target="_blank"
               rel="noopener noreferrer"
+              aria-disabled={selectedSiteId === ''}
+              onClick={(event) => {
+                if (selectedSiteId === '') {
+                  event.preventDefault()
+                }
+              }}
             >
               Stroomsnelheid van RWS
             </a>
