@@ -568,7 +568,7 @@ describe('getDuikvensters', () => {
                 van: '2026-03-04T13:30:00Z',
                 tot: '2026-03-04T15:50:00Z',
                 kentering: '2026-03-04T15:50:00Z',
-                kentering_type: 'LW',
+                kentering_type: '',
             },
         ])
     })
