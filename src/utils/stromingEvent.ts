@@ -22,10 +22,15 @@ export function toStromingEvent(event: unknown): StromingEvent | null {
   if (!Number.isFinite(numericValue)) {
     return null
   }
+  const numericRichting =
+    typeof rawRichting === 'number' ? rawRichting : Number(rawRichting)
+  if (!Number.isFinite(numericRichting)) {
+    return null
+  }
 
   return {
     timestamp: rawTimestamp,
     value: numericValue,
-    richting: rawRichting
+    richting: numericRichting,
   }
 }
