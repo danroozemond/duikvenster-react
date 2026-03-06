@@ -32,9 +32,9 @@ function formatDateLocal(value: string): string {
   }
 
   const weekday = date.toLocaleString(APP_LOCALE, { weekday: 'short' })
-  const month = date.toLocaleString(APP_LOCALE, { month: 'short' })
   const day = date.toLocaleString(APP_LOCALE, { day: '2-digit' })
-  return `${weekday} ${month} ${day}`
+  const month = date.toLocaleString(APP_LOCALE, { month: 'short' })
+  return `${weekday} ${day} ${month}`
 }
 
 function DuikvenstersTable({ events, badgeLabel }: Props) {
