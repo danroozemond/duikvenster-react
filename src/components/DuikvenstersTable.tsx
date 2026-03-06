@@ -97,7 +97,13 @@ function DuikvenstersTable({ events, badgeLabel }: Props) {
                   >
                     <td>{showDate ? row.dateLabel : ''}</td>
                     <td>{formatTimeLocal(row.duikvenster.van)}</td>
-                    <td>{formatTimeLocal(row.duikvenster.kentering)}</td>
+                    <td>
+                      {formatTimeLocal(row.duikvenster.kentering)}
+                      {row.duikvenster.kentering_type !== null &&
+                      row.duikvenster.kentering_type.trim() !== ''
+                        ? ` [${row.duikvenster.kentering_type}]`
+                        : ''}
+                    </td>
                     <td>{formatTimeLocal(row.duikvenster.tot)}</td>
                   </tr>
                 )
