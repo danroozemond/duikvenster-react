@@ -55,7 +55,11 @@ describe('fetchStromingsdata', () => {
   it('stores fetched events in localStorage as latest result with UTC datetimes', async () => {
     vi.spyOn(Date.prototype, 'getTimezoneOffset').mockReturnValue(-60)
 
-    const events = [{ value: 1 }, { value: 2 }, { value: 3 }]
+    const events = [
+      { timeStamp: '2026-03-02T10:00:00Z', value: 1 },
+      { timeStamp: '2026-03-02T11:00:00Z', value: 2 },
+      { timeStamp: '2026-03-02T12:00:00Z', value: 3 },
+    ]
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -76,14 +80,19 @@ describe('fetchStromingsdata', () => {
       '2026-03-04',
       'end',
     )
+    const expectedMergedEvents = [
+      { timeStamp: '2026-03-02T10:00:00Z', value: 1, richting: 1 },
+      { timeStamp: '2026-03-02T11:00:00Z', value: 2, richting: 2 },
+      { timeStamp: '2026-03-02T12:00:00Z', value: 3, richting: 3 },
+    ]
 
-    expect(result).toEqual(events)
+    expect(result).toEqual(expectedMergedEvents)
     expect(window.localStorage.getItem(STROMINGSDATA_STORAGE_KEY)).toEqual(
       JSON.stringify({
         siteId: 'zeeheks',
         dateTimeFrom: expectedDateTimeFrom,
         dateTimeTo: expectedDateTimeTo,
-        events,
+        events: expectedMergedEvents,
       }),
     )
   })
@@ -184,6 +193,47 @@ describe('fetchStromingsdata', () => {
     )
 
     expect(result).toEqual([])
+  })
+
+  it('sorts by timestamp and merges richting in linear pass after sorting', async () => {
+    vi.spyOn(Date.prototype, 'getTimezoneOffset').mockReturnValue(-60)
+
+    const events = [
+      { timeStamp: '2026-03-04T12:00:00Z', value: 3 },
+      { timeStamp: '2026-03-04T10:00:00Z', value: 1 },
+      { timeStamp: '2026-03-04T11:00:00Z', value: 2 },
+    ]
+    const eventsRichting = [
+      { timeStamp: '2026-03-04T11:00:00Z', value: 180 },
+      { timeStamp: '2026-03-04T10:00:00Z', value: 90 },
+      { timeStamp: '2026-03-04T12:00:00Z', value: 270 },
+    ]
+
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ results: [{ events }] }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ results: [{ events: eventsRichting }] }),
+      } as Response)
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await fetchStromingsdata(
+      'zeeheks',
+      '2026-03-01',
+      '2026-03-04',
+    )
+
+    expect(result).toEqual([
+      { timeStamp: '2026-03-04T10:00:00Z', value: 1, richting: 90 },
+      { timeStamp: '2026-03-04T11:00:00Z', value: 2, richting: 180 },
+      { timeStamp: '2026-03-04T12:00:00Z', value: 3, richting: 270 },
+    ])
   })
 })
 

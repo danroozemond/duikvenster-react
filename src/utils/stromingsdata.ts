@@ -154,34 +154,76 @@ function mergeEventsWithRichting(
   events: unknown[],
   eventsRichting: unknown[],
 ): unknown[] {
-  const richtingByTimestamp = new Map<string, unknown>()
-  for (const event of eventsRichting) {
+  const getTimestamp = (event: unknown): string | null => {
     if (typeof event !== 'object' || event === null) {
-      continue
+      return null
     }
 
     const timestamp = (event as { timeStamp?: unknown }).timeStamp
     if (typeof timestamp !== 'string' || timestamp.trim() === '') {
-      continue
+      return null
     }
 
-    richtingByTimestamp.set(timestamp, (event as { value?: unknown }).value)
+    return timestamp
   }
 
-  return events.map((event) => {
-    if (typeof event !== 'object' || event === null) {
+  const sortedEvents = [...events].sort((a, b) =>
+    (a as { timeStamp: string }).timeStamp.localeCompare(
+      (b as { timeStamp: string }).timeStamp,
+    ),
+  )
+
+  const sortedRichting = [...eventsRichting].sort((a, b) =>
+    (a as { timeStamp: string }).timeStamp.localeCompare(
+      (b as { timeStamp: string }).timeStamp,
+    ),
+  )
+
+  let richtingIndex = 0
+
+  return sortedEvents.map((event) => {
+    const eventTimestamp = getTimestamp(event)
+    if (eventTimestamp === null || typeof event !== 'object' || event === null) {
       return event
     }
 
-    const timestamp = (event as { timeStamp?: unknown }).timeStamp
-    if (typeof timestamp !== 'string' || !richtingByTimestamp.has(timestamp)) {
-      return event
+    while (richtingIndex < sortedRichting.length) {
+      const richtingEvent = sortedRichting[richtingIndex]
+      const richtingTimestamp = getTimestamp(richtingEvent)
+      if (richtingTimestamp === null) {
+        richtingIndex += 1
+        continue
+      }
+
+      if (richtingTimestamp < eventTimestamp) {
+        richtingIndex += 1
+        continue
+      }
+
+      if (richtingTimestamp > eventTimestamp) {
+        return event
+      }
+
+      let matchedRichtingValue = (richtingEvent as { value?: unknown }).value
+      let nextIndex = richtingIndex + 1
+      while (nextIndex < sortedRichting.length) {
+        const nextRichtingEvent = sortedRichting[nextIndex]
+        const nextTimestamp = getTimestamp(nextRichtingEvent)
+        if (nextTimestamp !== eventTimestamp) {
+          break
+        }
+        matchedRichtingValue = (nextRichtingEvent as { value?: unknown }).value
+        nextIndex += 1
+      }
+
+      richtingIndex = nextIndex
+      return {
+        ...(event as Record<string, unknown>),
+        richting: matchedRichtingValue,
+      }
     }
 
-    return {
-      ...(event as Record<string, unknown>),
-      richting: richtingByTimestamp.get(timestamp),
-    }
+    return event
   })
 }
 
