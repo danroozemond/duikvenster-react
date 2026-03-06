@@ -568,6 +568,7 @@ describe('getDuikvensters', () => {
                 van: '2026-03-04T13:30:00Z',
                 tot: '2026-03-04T15:50:00Z',
                 kentering: '2026-03-04T15:50:00Z',
+                kentering_type: 'LW',
             },
         ])
     })
@@ -589,6 +590,7 @@ describe('getDuikvensters', () => {
                 van: '2026-03-04T23:50:00Z',
                 tot: '2026-03-05T00:20:00Z',
                 kentering: '2026-03-05T00:10:00Z',
+                kentering_type: 'LW',
             },
         ])
     })
