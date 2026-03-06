@@ -1,13 +1,13 @@
 import Container from 'react-bootstrap/Container'
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import AppNavbar from '../components/AppNavbar'
 import Infotext from '../components/Infotext'
-import StromingLineChart from '../components/StromingLineChart'
 import DuikvenstersTable from '../components/DuikvenstersTable'
 import diveSites from '../data/diveSites.json'
 import { fetchStromingsdata } from '../utils/stromingsdata'
 
 const SELECTED_SITE_STORAGE_KEY = 'duikvenster.selectedDiveSiteId'
+const StromingLineChart = lazy(() => import('../components/StromingLineChart'))
 
 function HomePage() {
   const diveSitesRecord: Record<string, string> = diveSites
@@ -110,7 +110,9 @@ function HomePage() {
             !isLoadingStromingsdata &&
             !stromingsdataError ? (
               stromingsdata !== null && stromingsdata.length > 0 ? (
-                <StromingLineChart events={stromingsdata} />
+                <Suspense fallback={<p className="mb-0">Grafiek wordt geladen...</p>}>
+                  <StromingLineChart events={stromingsdata} />
+                </Suspense>
               ) : (
                 <p className="mb-0">
                   Geen stromingsdata beschikbaar voor <strong>{selectedSiteName}</strong>.
