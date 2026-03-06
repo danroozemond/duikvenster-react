@@ -1,7 +1,21 @@
 export const STROMINGSDATA_STORAGE_KEY = 'duikvenster.stromingsdata.latest'
 
 export const STROMINGSDATA_URL_TEMPLATE =
-  'https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG_SOF_6.1.ms&sourceName=compute&locationCode={siteId}&startTime={dateTimeFrom}&endTime={dateTimeTo}'
+    'https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG_SOF_6.1.ms&sourceName=compute&locationCode={siteId}&startTime={dateTimeFrom}&endTime={dateTimeTo}'
+
+export const STROMINGSRICHTING_URL_TEMPLATE =
+    'https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG.2&sourceName=SOF_6&locationCode={siteId}&startTime={dateTimeFrom}&endTime={dateTimeTo}'
+
+
+// note voorbeeld stroomsnelheid
+// https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG_SOF_6.1.ms&sourceName=compute&locationCode=znp2&startTime=2026-03-03T23%3A00%3A00Z&endTime=2026-03-07T22%3A59%3A59Z
+
+// note voorbeeld richting
+// https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=SG.2&sourceName=SOF_6&locationCode=znp2&startTime=2026-03-03T23%3A00%3A00Z&endTime=2026-03-07T22%3A59%3A59Z
+
+// note voorbeeld waterhoogte, dit zijn andere locaties, dus onhandig.
+// https://rwsos.rws.nl/wb-api/dd/2.0/timeseries?observationTypeId=WT&sourceName=h_6&locationCode=zn&startTime=2026-03-03T23%3A00%3A00Z&endTime=2026-03-07T22%3A59%3A59Z
+
 
 type DateInput = Date | string
 
@@ -93,41 +107,18 @@ export function toUtcDateTimeFromLocalDate(
 }
 
 export function buildStromingsdataUrl(
+  url: string,
   siteId: string,
   dateTimeFrom: string,
   dateTimeTo: string,
 ): string {
-  return STROMINGSDATA_URL_TEMPLATE
+  return url
     .replace('{siteId}', encodeURIComponent(siteId))
     .replace('{dateTimeFrom}', encodeURIComponent(dateTimeFrom))
     .replace('{dateTimeTo}', encodeURIComponent(dateTimeTo))
 }
 
-export async function fetchStromingsdata(
-  siteId: string,
-  dateFrom?: DateInput,
-  dateTo?: DateInput,
-): Promise<unknown[]> {
-  if (siteId.trim() === '') {
-    throw new Error('siteId is required')
-  }
-
-  const normalizedDateFrom = resolveDateInput(dateFrom, getDefaultDateFrom())
-  const normalizedDateTo = resolveDateInput(dateTo, getDefaultDateTo())
-  const normalizedDateTimeFrom = toUtcDateTimeFromLocalDate(
-    normalizedDateFrom,
-    'start',
-  )
-  const normalizedDateTimeTo = toUtcDateTimeFromLocalDate(
-    normalizedDateTo,
-    'end',
-  )
-
-  const url = buildStromingsdataUrl(
-    siteId,
-    normalizedDateTimeFrom,
-    normalizedDateTimeTo,
-  )
+async function fetchEventsFromUrl(url: string): Promise<unknown[]> {
   let events: unknown[] = []
 
   try {
@@ -156,14 +147,92 @@ export async function fetchStromingsdata(
     events = []
   }
 
+  return events
+}
+
+function mergeEventsWithRichting(
+  events: unknown[],
+  eventsRichting: unknown[],
+): unknown[] {
+  const richtingByTimestamp = new Map<string, unknown>()
+  for (const event of eventsRichting) {
+    if (typeof event !== 'object' || event === null) {
+      continue
+    }
+
+    const timestamp = (event as { timeStamp?: unknown }).timeStamp
+    if (typeof timestamp !== 'string' || timestamp.trim() === '') {
+      continue
+    }
+
+    richtingByTimestamp.set(timestamp, (event as { value?: unknown }).value)
+  }
+
+  return events.map((event) => {
+    if (typeof event !== 'object' || event === null) {
+      return event
+    }
+
+    const timestamp = (event as { timeStamp?: unknown }).timeStamp
+    if (typeof timestamp !== 'string' || !richtingByTimestamp.has(timestamp)) {
+      return event
+    }
+
+    return {
+      ...(event as Record<string, unknown>),
+      richting: richtingByTimestamp.get(timestamp),
+    }
+  })
+}
+
+export async function fetchStromingsdata(
+  siteId: string,
+  dateFrom?: DateInput,
+  dateTo?: DateInput,
+): Promise<unknown[]> {
+  if (siteId.trim() === '') {
+    throw new Error('siteId is required')
+  }
+
+  const normalizedDateFrom = resolveDateInput(dateFrom, getDefaultDateFrom())
+  const normalizedDateTo = resolveDateInput(dateTo, getDefaultDateTo())
+  const normalizedDateTimeFrom = toUtcDateTimeFromLocalDate(
+    normalizedDateFrom,
+    'start',
+  )
+  const normalizedDateTimeTo = toUtcDateTimeFromLocalDate(
+    normalizedDateTo,
+    'end',
+  )
+
+  const url_stroming = buildStromingsdataUrl(
+      STROMINGSDATA_URL_TEMPLATE,
+      siteId,
+      normalizedDateTimeFrom,
+      normalizedDateTimeTo,
+  )
+  const url_richting = buildStromingsdataUrl(
+      STROMINGSRICHTING_URL_TEMPLATE,
+      siteId,
+      normalizedDateTimeFrom,
+      normalizedDateTimeTo,
+  )
+
+  const [events, events_richting] = await Promise.all([
+    fetchEventsFromUrl(url_stroming),
+    fetchEventsFromUrl(url_richting),
+  ])
+  const mergedEvents = mergeEventsWithRichting(events, events_richting)
+
   window.localStorage.setItem(
     STROMINGSDATA_STORAGE_KEY,
     JSON.stringify({
       siteId,
       dateTimeFrom: normalizedDateTimeFrom,
       dateTimeTo: normalizedDateTimeTo,
-      events,
+      events: mergedEvents,
     }),
   )
-  return events
+
+  return mergedEvents
 }
