@@ -111,7 +111,13 @@ describe('fetchStromingsdata', () => {
     )
 
     expect(result).toEqual(events)
-    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('observationTypeId=SG_SOF_6.1.ms'),
+    )
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('observationTypeId=SG.2'),
+    )
   })
 
   it('overwrites previously stored latest data with the new fetch result', async () => {
@@ -144,7 +150,13 @@ describe('fetchStromingsdata', () => {
     )
 
     expect(result).toEqual(events)
-    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('observationTypeId=SG_SOF_6.1.ms'),
+    )
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('observationTypeId=SG.2'),
+    )
     expect(window.localStorage.getItem(STROMINGSDATA_STORAGE_KEY)).toEqual(
       JSON.stringify({
         siteId: 'zeeheks',

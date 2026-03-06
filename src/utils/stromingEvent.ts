@@ -1,6 +1,7 @@
 export type StromingEvent = {
   timestamp: string
   value: number
+  richting: number
 }
 
 export function toStromingEvent(event: unknown): StromingEvent | null {
@@ -10,6 +11,7 @@ export function toStromingEvent(event: unknown): StromingEvent | null {
 
   const rawTimestamp = (event as { timeStamp?: unknown }).timeStamp
   const rawValue = (event as { value?: unknown }).value
+  const rawRichting = (event as { richting?: unknown }).richting
 
   if (typeof rawTimestamp !== 'string' || rawTimestamp.trim() === '') {
     return null
@@ -24,5 +26,6 @@ export function toStromingEvent(event: unknown): StromingEvent | null {
   return {
     timestamp: rawTimestamp,
     value: numericValue,
+    richting: rawRichting
   }
 }
