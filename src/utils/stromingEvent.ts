@@ -1,7 +1,7 @@
 export type StromingEvent = {
   timestamp: string
   value: number
-  richting: number
+  richting: number | null
 }
 
 export function toStromingEvent(event: unknown): StromingEvent | null {
@@ -24,13 +24,10 @@ export function toStromingEvent(event: unknown): StromingEvent | null {
   }
   const numericRichting =
     typeof rawRichting === 'number' ? rawRichting : Number(rawRichting)
-  if (!Number.isFinite(numericRichting)) {
-    return null
-  }
 
   return {
     timestamp: rawTimestamp,
     value: numericValue,
-    richting: numericRichting,
+    richting: Number.isFinite(numericRichting) ? numericRichting : null,
   }
 }
