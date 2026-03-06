@@ -300,13 +300,19 @@ body {
 
   .duikvensters-table th:nth-child(1),
   .duikvensters-table td:nth-child(1) {
-    width: 34%;
+    width: 28%;
   }
 
   .duikvensters-table th:nth-child(2),
-  .duikvensters-table td:nth-child(2),
+  .duikvensters-table td:nth-child(2) {
+    width: 22%;
+  }
+
   .duikvensters-table th:nth-child(3),
-  .duikvensters-table td:nth-child(3),
+  .duikvensters-table td:nth-child(3) {
+    width: 28%;
+  }
+
   .duikvensters-table th:nth-child(4),
   .duikvensters-table td:nth-child(4) {
     width: 22%;
