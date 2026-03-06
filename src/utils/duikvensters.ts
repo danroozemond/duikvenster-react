@@ -34,6 +34,32 @@ export class Duikvenster {
 
     return toMs - fromMs >= MIN_DUIKVENSTER_DURATION_MS
   }
+
+  updateKenteringTypeAtOpenWindow(stroomrichting: number|null) {
+    // Set; stroomrichting < 180 -> oostwaarts -> de kentering *wordt* HW
+    if (stroomrichting != null)
+    {
+      this.kentering_type = ( stroomrichting < 180.0 ? 'HW' : 'LW' )
+    }
+    else
+    {
+      this.kentering_type = ''
+    }
+  }
+
+  updateKenteringTypeAtClosingWindow(stroomrichting: number|null) {
+    // Check; stroomrichting < 180 -> oostwaarts -> de kentering *was* LW
+    // If it doesn't match, reset (apparently we're not sure)
+    if (stroomrichting == null)
+    {
+      return
+    }
+
+    const kt = ( stroomrichting < 180.0 ? 'LW' : 'HW' )
+    if ( this.kentering_type != kt ) {
+      this.kentering_type = ''
+    }
+  }
 }
 
 export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
@@ -55,6 +81,7 @@ export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
           se.timestamp,
           se.value
         )
+        currentWindow.updateKenteringTypeAtOpenWindow(se.richting)
       }
       // open/extend end of window
       currentWindow.tot = se.timestamp
@@ -66,6 +93,7 @@ export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
     } else if (currentWindow !== null) {
       // close window (and store)
       if (currentWindow.hasMinimumDuration()) {
+        currentWindow.updateKenteringTypeAtClosingWindow(se.richting)
         windows.push(currentWindow)
       }
       currentWindow = null
