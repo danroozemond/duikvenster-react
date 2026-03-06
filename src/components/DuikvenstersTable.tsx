@@ -32,9 +32,9 @@ function formatDateLocal(value: string): string {
   }
 
   const weekday = date.toLocaleString(APP_LOCALE, { weekday: 'short' })
-  const month = date.toLocaleString(APP_LOCALE, { month: 'short' })
   const day = date.toLocaleString(APP_LOCALE, { day: '2-digit' })
-  return `${weekday} ${month} ${day}`
+  const month = date.toLocaleString(APP_LOCALE, { month: 'short' })
+  return `${weekday} ${day} ${month}`
 }
 
 function DuikvenstersTable({ events, badgeLabel }: Props) {
@@ -97,7 +97,13 @@ function DuikvenstersTable({ events, badgeLabel }: Props) {
                   >
                     <td>{showDate ? row.dateLabel : ''}</td>
                     <td>{formatTimeLocal(row.duikvenster.van)}</td>
-                    <td>{formatTimeLocal(row.duikvenster.kentering)}</td>
+                    <td>
+                      {formatTimeLocal(row.duikvenster.kentering)}
+                      {row.duikvenster.kentering_type !== null &&
+                      row.duikvenster.kentering_type.trim() !== ''
+                        ? ` [${row.duikvenster.kentering_type}]`
+                        : ''}
+                    </td>
                     <td>{formatTimeLocal(row.duikvenster.tot)}</td>
                   </tr>
                 )
