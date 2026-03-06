@@ -26,11 +26,15 @@ function AppNavbar({ sites, selectedSiteId, onSiteChange }: AppNavbarProps) {
             disabled={siteEntries.length === 0}
           >
             <option value="">Selecteer een stek</option>
-            {siteEntries.map(([siteId, siteName]) => (
-              <option key={siteId} value={siteId}>
-                {siteName}
-              </option>
-            ))}
+            {siteEntries.map(([siteId, siteName]) => {
+              const isSeparator = siteId.startsWith('__separator_')
+
+              return (
+                <option key={siteId} value={isSeparator ? '' : siteId} disabled={isSeparator}>
+                  {siteName}
+                </option>
+              )
+            })}
           </Form.Select>
         </div>
       </Container>
