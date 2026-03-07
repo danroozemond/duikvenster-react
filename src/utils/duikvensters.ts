@@ -12,17 +12,24 @@ export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
   const windows: Duikvenster[] = []
   let currentWindow: Duikvenster | null = null
 
-  for (const se of orderedData) {
+  for (const [index, se] of orderedData.entries()) {
     if (se.value <= DUIKVENSTER_THRESHOLD) {
       // open new window, or extend existing window
       if (currentWindow === null) {
+        // new window
         currentWindow = new Duikvenster(
           se.timestamp,
           se.timestamp,
           se.timestamp,
           se.value
         )
+        //set kentering type
         currentWindow.updateKenteringTypeAtOpenWindow(se.richting)
+        // interpolate
+        if (index > 0) {
+          const prevEvent = orderedData[index - 1]
+          currentWindow.updateVanWithInterpolate(se.value, prevEvent.timestamp, prevEvent.value, DUIKVENSTER_THRESHOLD)
+        }
       }
       // open/extend end of window
       currentWindow.tot = se.timestamp
