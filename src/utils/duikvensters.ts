@@ -39,6 +39,11 @@ export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
         currentWindow.kentering_value = se.value
       }
     } else if (currentWindow !== null) {
+      // interpolate if possible
+      if (index > 0) {
+        const prevEvent = orderedData[index - 1]
+        currentWindow.updateTotWithInterpolate(prevEvent.value, se.timestamp, se.value, DUIKVENSTER_THRESHOLD)
+      }
       // close window (and store)
       if (currentWindow.hasMinimumDuration()) {
         currentWindow.updateKenteringTypeAtClosingWindow(se.richting)
