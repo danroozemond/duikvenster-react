@@ -81,4 +81,16 @@ export class Duikvenster {
       this.kentering_type = ''
     }
   }
+
+  updateVanWithInterpolate(valueVan: number, timeB: string, valueB: number, targetValue: number) {
+    // Intended use:
+    // Update the 'van' time using interpolation and the previous datapoint
+    this.van = Duikvenster.interpolateTime( this.van, valueVan, timeB, valueB, targetValue)
+  }
+
+  updateTotWithInterpolate(valueTot: number, timeB: string, valueB: number, targetValue: number) {
+    // Intended use:
+    // Update the 'tot' time using interpolation and the next datapoint
+    this.tot = Duikvenster.interpolateTime( this.tot, valueTot, timeB, valueB, targetValue)
+  }
 }
