@@ -26,15 +26,15 @@ describe('Duikvenster.interpolateTime', () => {
     expect(result).toBe('2026-03-07T11:30:00.000Z')
   })
 
-  it('throws when endpoint values are equal and target differs', () => {
-    expect(() =>
-      Duikvenster.interpolateTime(
-        '2026-03-07T10:00:00Z',
-        0.2,
-        '2026-03-07T11:00:00Z',
-        0.2,
-        0.3,
-      ),
-    ).toThrow('Cannot interpolate with equal endpoint values.')
+  it('returns timeA when endpoint values are equal', () => {
+    const result = Duikvenster.interpolateTime(
+      '2026-03-07T10:00:00Z',
+      0.2,
+      '2026-03-07T11:00:00Z',
+      0.2,
+      0.3,
+    )
+
+    expect(result).toBe('2026-03-07T10:00:00Z')
   })
 })
