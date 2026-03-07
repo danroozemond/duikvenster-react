@@ -11,7 +11,7 @@ describe('Duikvenster.interpolateTime', () => {
       0.2,
     )
 
-    expect(result).toBe('2026-03-07T10:30:00.000Z')
+    expect(result).toBe('2026-03-07T10:30:00Z')
   })
 
   it('supports extrapolation outside the endpoint value range', () => {
@@ -23,7 +23,7 @@ describe('Duikvenster.interpolateTime', () => {
       0.4,
     )
 
-    expect(result).toBe('2026-03-07T11:30:00.000Z')
+    expect(result).toBe('2026-03-07T11:30:00Z')
   })
 
   it('returns timeA when endpoint values are equal', () => {
