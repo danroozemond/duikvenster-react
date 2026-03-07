@@ -531,20 +531,20 @@ describe('getDuikvensters', () => {
         expect(
             getDuikvensters(stromingsdata).map(({van, tot, kentering, kentering_type}) => ({van, tot, kentering, kentering_type}))
         ).toEqual([
-            {van: '2026-03-04T02:38:00Z', tot: '2026-03-04T03:20:00Z', kentering: '2026-03-04T03:10:00Z', kentering_type: 'HW'},
-            {van: '2026-03-04T08:57:00Z', tot: '2026-03-04T09:40:00Z', kentering: '2026-03-04T09:20:00Z', kentering_type: 'LW'},
-            {van: '2026-03-04T15:03:00Z', tot: '2026-03-04T15:50:00Z', kentering: '2026-03-04T15:40:00Z', kentering_type: 'HW'},
-            {van: '2026-03-04T21:08:00Z', tot: '2026-03-04T21:50:00Z', kentering: '2026-03-04T21:40:00Z', kentering_type: 'LW'},
-            {van: '2026-03-05T03:15:00Z', tot: '2026-03-05T04:00:00Z', kentering: '2026-03-05T03:40:00Z', kentering_type: 'HW'},
-            {van: '2026-03-05T09:33:00Z', tot: '2026-03-05T10:20:00Z', kentering: '2026-03-05T10:00:00Z', kentering_type: 'LW'},
-            {van: '2026-03-05T15:40:00Z', tot: '2026-03-05T16:30:00Z', kentering: '2026-03-05T16:10:00Z', kentering_type: 'HW'},
-            {van: '2026-03-05T21:45:00Z', tot: '2026-03-05T22:30:00Z', kentering: '2026-03-05T22:10:00Z', kentering_type: 'LW'},
-            {van: '2026-03-06T03:52:00Z', tot: '2026-03-06T04:40:00Z', kentering: '2026-03-06T04:20:00Z', kentering_type: 'HW'},
-            {van: '2026-03-06T10:13:00Z', tot: '2026-03-06T10:50:00Z', kentering: '2026-03-06T10:40:00Z', kentering_type: 'LW'},
-            {van: '2026-03-06T16:10:00Z', tot: '2026-03-06T17:00:00Z', kentering: '2026-03-06T16:40:00Z', kentering_type: 'HW'},
-            {van: '2026-03-06T22:18:00Z', tot: '2026-03-06T23:00:00Z', kentering: '2026-03-06T22:40:00Z', kentering_type: 'LW'},
-            {van: '2026-03-07T04:20:00Z', tot: '2026-03-07T05:10:00Z', kentering: '2026-03-07T04:50:00Z', kentering_type: 'HW'},
-            {van: '2026-03-07T10:39:00Z', tot: '2026-03-07T11:20:00Z', kentering: '2026-03-07T11:10:00Z', kentering_type: 'LW'},
+            {van: '2026-03-04T02:38:00Z', tot: '2026-03-04T03:29:00Z', kentering: '2026-03-04T03:10:00Z', kentering_type: 'HW'},
+            {van: '2026-03-04T08:57:00Z', tot: '2026-03-04T09:45:00Z', kentering: '2026-03-04T09:20:00Z', kentering_type: 'LW'},
+            {van: '2026-03-04T15:03:00Z', tot: '2026-03-04T15:57:00Z', kentering: '2026-03-04T15:40:00Z', kentering_type: 'HW'},
+            {van: '2026-03-04T21:08:00Z', tot: '2026-03-04T21:58:00Z', kentering: '2026-03-04T21:40:00Z', kentering_type: 'LW'},
+            {van: '2026-03-05T03:15:00Z', tot: '2026-03-05T04:05:00Z', kentering: '2026-03-05T03:40:00Z', kentering_type: 'HW'},
+            {van: '2026-03-05T09:33:00Z', tot: '2026-03-05T10:23:00Z', kentering: '2026-03-05T10:00:00Z', kentering_type: 'LW'},
+            {van: '2026-03-05T15:40:00Z', tot: '2026-03-05T16:31:00Z', kentering: '2026-03-05T16:10:00Z', kentering_type: 'HW'},
+            {van: '2026-03-05T21:45:00Z', tot: '2026-03-05T22:33:00Z', kentering: '2026-03-05T22:10:00Z', kentering_type: 'LW'},
+            {van: '2026-03-06T03:52:00Z', tot: '2026-03-06T04:42:00Z', kentering: '2026-03-06T04:20:00Z', kentering_type: 'HW'},
+            {van: '2026-03-06T10:13:00Z', tot: '2026-03-06T10:59:00Z', kentering: '2026-03-06T10:40:00Z', kentering_type: 'LW'},
+            {van: '2026-03-06T16:10:00Z', tot: '2026-03-06T17:03:00Z', kentering: '2026-03-06T16:40:00Z', kentering_type: 'HW'},
+            {van: '2026-03-06T22:18:00Z', tot: '2026-03-06T23:05:00Z', kentering: '2026-03-06T22:40:00Z', kentering_type: 'LW'},
+            {van: '2026-03-07T04:20:00Z', tot: '2026-03-07T05:11:00Z', kentering: '2026-03-07T04:50:00Z', kentering_type: 'HW'},
+            {van: '2026-03-07T10:39:00Z', tot: '2026-03-07T11:29:00Z', kentering: '2026-03-07T11:10:00Z', kentering_type: 'LW'},
         ])
     })
 
@@ -566,7 +566,7 @@ describe('getDuikvensters', () => {
         ).toEqual([
             {
                 van: '2026-03-04T12:55:00Z',
-                tot: '2026-03-04T15:50:00Z',
+                tot: '2026-03-04T15:57:00Z',
                 kentering: '2026-03-04T15:50:00Z',
                 kentering_type: '',
             },
@@ -588,7 +588,7 @@ describe('getDuikvensters', () => {
         ).toEqual([
             {
                 van: '2026-03-04T23:48:00Z',
-                tot: '2026-03-05T00:20:00Z',
+                tot: '2026-03-05T00:23:00Z',
                 kentering: '2026-03-05T00:10:00Z',
                 kentering_type: 'LW',
             },
