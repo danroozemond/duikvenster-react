@@ -52,8 +52,9 @@ export class Duikvenster {
 
     const fraction = (targetValue - valueA) / (valueB - valueA)
     const interpolatedTimeMs = timeAMs + fraction * (timeBMs - timeAMs)
+    const roundedToMinuteMs = Math.round(interpolatedTimeMs / 60000) * 60000
 
-    return new Date(interpolatedTimeMs).toISOString()
+    return new Date(roundedToMinuteMs).toISOString()
   }
 
   hasMinimumDuration(): boolean {
