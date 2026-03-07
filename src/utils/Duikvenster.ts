@@ -28,6 +28,9 @@ export class Duikvenster {
     valueB: number,
     targetValue: number,
   ): string {
+    const stripMilliseconds = (timestamp: string) =>
+      timestamp.replace(/\.\d{3}Z$/, 'Z')
+
     const timeAMs = new Date(timeA).getTime()
     const timeBMs = new Date(timeB).getTime()
 
@@ -46,7 +49,7 @@ export class Duikvenster {
     const interpolatedTimeMs = timeAMs + fraction * (timeBMs - timeAMs)
     const roundedToMinuteMs = Math.round(interpolatedTimeMs / 60000) * 60000
 
-    return new Date(roundedToMinuteMs).toISOString()
+    return stripMilliseconds(new Date(roundedToMinuteMs).toISOString())
   }
 
   hasMinimumDuration(): boolean {
