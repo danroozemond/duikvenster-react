@@ -578,7 +578,7 @@ describe('getDuikvensters', () => {
             {timeStamp: '2026-03-04T23:40:00Z', value: 0.24, richting: 230},
             {timeStamp: '2026-03-04T23:50:00Z', value: 0.19, richting: 230},
             {timeStamp: '2026-03-05T00:00:00Z', value: 0.18, richting: 230},
-            {timeStamp: '2026-03-05T00:10:00Z', value: 0.17, richting: 50},
+            {timeStamp: '2026-03-05T00:10:00Z', value: 0.06, richting: 50},
             {timeStamp: '2026-03-05T00:20:00Z', value: 0.18, richting: 50},
             {timeStamp: '2026-03-05T00:30:00Z', value: 0.24, richting: 50},
         ]

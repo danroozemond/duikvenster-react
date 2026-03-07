@@ -72,10 +72,16 @@ export class Duikvenster {
     }
   }
 
-  updateKenteringTypeAtClosingWindow(stroomrichting: number | null) {
+  updateKenteringAtClosingWindow(stroomrichting: number | null, value_threshold: number) {
     // Check; stroomrichting < 180 -> oostwaarts -> de kentering *was* LW
     // If it doesn't match, reset (apparently we're not sure)
+    // Also, if the value (stroomsnelheid) is too small then it's not really kentering
     if (stroomrichting == null) {
+      return
+    }
+
+    if (this.kentering_value > value_threshold) {
+      this.kentering_type = ''
       return
     }
 

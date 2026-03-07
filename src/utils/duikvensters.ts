@@ -2,6 +2,7 @@ import { toStromingEvent, type StromingEvent } from './stromingEvent'
 import { Duikvenster } from './Duikvenster'
 
 const DUIKVENSTER_THRESHOLD = 0.2 //=20 cm/s, suggested by NOB
+const IS_KENTERING_THRESHOLD = DUIKVENSTER_THRESHOLD / 2.0
 
 export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
   const orderedData: StromingEvent[] = stromingsdata
@@ -46,7 +47,7 @@ export function getDuikvensters(stromingsdata: unknown[]): Duikvenster[] {
       }
       // close window (and store)
       if (currentWindow.hasMinimumDuration()) {
-        currentWindow.updateKenteringTypeAtClosingWindow(se.richting)
+        currentWindow.updateKenteringAtClosingWindow(se.richting, IS_KENTERING_THRESHOLD)
         windows.push(currentWindow)
       }
       currentWindow = null
