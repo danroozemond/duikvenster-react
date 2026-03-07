@@ -21,6 +21,41 @@ export class Duikvenster {
     this.kentering_type = kenteringType
   }
 
+  static interpolateTime(
+    timeA: string,
+    valueA: number,
+    timeB: string,
+    valueB: number,
+    targetValue: number,
+  ): string {
+    const timeAMs = new Date(timeA).getTime()
+    const timeBMs = new Date(timeB).getTime()
+
+    if (!Number.isFinite(timeAMs) || !Number.isFinite(timeBMs)) {
+      throw new Error('Invalid time input for interpolation.')
+    }
+
+    if (
+      !Number.isFinite(valueA) ||
+      !Number.isFinite(valueB) ||
+      !Number.isFinite(targetValue)
+    ) {
+      throw new Error('Invalid value input for interpolation.')
+    }
+
+    if (valueA === valueB) {
+      if (targetValue === valueA) {
+        return new Date(timeAMs).toISOString()
+      }
+      throw new Error('Cannot interpolate with equal endpoint values.')
+    }
+
+    const fraction = (targetValue - valueA) / (valueB - valueA)
+    const interpolatedTimeMs = timeAMs + fraction * (timeBMs - timeAMs)
+
+    return new Date(interpolatedTimeMs).toISOString()
+  }
+
   hasMinimumDuration(): boolean {
     const fromMs = new Date(this.van).getTime()
     const toMs = new Date(this.tot).getTime()
