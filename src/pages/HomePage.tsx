@@ -159,7 +159,7 @@ function HomePage() {
           />
         ) : null}
         <section className="chart-card mt-4">
-          <h2 className="chart-card-title mb-3">Let op</h2>
+          <h2 className="chart-card-title mb-3">Meer informatie en let op!</h2>
           <Infotext />
         </section>
       </Container>
