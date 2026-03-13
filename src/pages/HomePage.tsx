@@ -1,10 +1,11 @@
 import Container from 'react-bootstrap/Container'
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import AppNavbar from '../components/AppNavbar'
 import Infotext from '../components/Infotext'
 import DuikvenstersTable from '../components/DuikvenstersTable'
 import diveSites from '../data/diveSites.json'
 import { fetchStromingsdata } from '../utils/stromingsdata'
+import { getDuikvensters } from '../utils/duikvensters'
 
 const SELECTED_SITE_STORAGE_KEY = 'duikvenster.selectedDiveSiteId'
 const StromingLineChart = lazy(() => import('../components/StromingLineChart'))
@@ -24,6 +25,7 @@ function HomePage() {
     return ''
   })
   const [stromingsdata, setStromingsdata] = useState<unknown[] | null>(null)
+  const duikvensters = useMemo(() => getDuikvensters(stromingsdata ?? []), [stromingsdata])
   const [isLoadingStromingsdata, setIsLoadingStromingsdata] = useState(false)
   const [stromingsdataError, setStromingsdataError] = useState<string | null>(null)
 
@@ -115,7 +117,7 @@ function HomePage() {
             !stromingsdataError ? (
               stromingsdata !== null && stromingsdata.length > 0 ? (
                 <Suspense fallback={<p className="mb-0">Grafiek wordt geladen...</p>}>
-                  <StromingLineChart events={stromingsdata} />
+                  <StromingLineChart events={stromingsdata} duikvensters={duikvensters} />
                 </Suspense>
               ) : (
                 <p className="mb-0">
@@ -154,7 +156,7 @@ function HomePage() {
         !stromingsdataError &&
         stromingsdata !== null ? (
           <DuikvenstersTable
-            events={stromingsdata}
+            duikvensters={duikvensters}
             badgeLabel={selectedSiteName || 'Nog geen stek geselecteerd'}
           />
         ) : null}
