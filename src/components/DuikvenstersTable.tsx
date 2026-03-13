@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getDuikvensters } from '../utils/duikvensters'
+import type { Duikvenster } from '../utils/Duikvenster'
 import { APP_LOCALE } from '../utils/locale'
 
 type Props = {
-  events: unknown[]
+  duikvensters: Duikvenster[]
   badgeLabel: string
 }
 
@@ -37,8 +37,7 @@ function formatDateLocal(value: string): string {
   return `${weekday} ${day} ${month}`
 }
 
-function DuikvenstersTable({ events, badgeLabel }: Props) {
-  const duikvensters = useMemo(() => getDuikvensters(events), [events])
+function DuikvenstersTable({ duikvensters, badgeLabel }: Props) {
   const processedRows = useMemo(
     () =>
       duikvensters.map((duikvenster, index) => {
