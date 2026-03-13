@@ -9,6 +9,7 @@ import {
   toTimestampMs,
 } from '../utils/stromingChartTime'
 import { toStromingEvent, type StromingEvent } from '../utils/stromingEvent'
+import type { Duikvenster } from '../utils/Duikvenster'
 
 const ReactApexChart = lazy(() => import('react-apexcharts'))
 
@@ -19,6 +20,7 @@ type ApexPoint = {
 
 type Props = {
   events: unknown[]
+  duikvensters: Duikvenster[]
 }
 
 type XAxisRange = {
@@ -55,7 +57,7 @@ function isZoomedRange(
   )
 }
 
-function StromingLineChart({ events }: Props) {
+function StromingLineChart({ events, duikvensters }: Props) {
   const [isZoomed, setIsZoomed] = useState(false)
   const [isChartMounted, setIsChartMounted] = useState(false)
   const [isMobile, setIsMobile] = useState(() => {
@@ -144,6 +146,30 @@ function StromingLineChart({ events }: Props) {
     () => buildSixHourAnnotations(timestamps),
     [timestamps],
   )
+  const kenteringAnnotations = useMemo(() => {
+    const KENTERING_COLOR = '#6c757d'
+    return duikvensters
+      .filter((dv) => dv.kentering_type === 'HW' || dv.kentering_type === 'LW')
+      .flatMap((dv) => {
+        const x = toTimestampMs(dv.kentering)
+        if (x === null) return []
+        return [{
+          x,
+          borderColor: KENTERING_COLOR,
+          borderWidth: 1,
+          strokeDashArray: 3,
+          label: {
+            text: dv.kentering_type,
+            borderColor: KENTERING_COLOR,
+            style: {
+              background: KENTERING_COLOR,
+              color: '#ffffff',
+              fontSize: '11px',
+            },
+          },
+        }]
+      })
+  }, [duikvensters])
   const nowAnnotation = useMemo(
     () => ({
       x: Date.now(),
@@ -250,7 +276,7 @@ function StromingLineChart({ events }: Props) {
         },
       },
       annotations: {
-        xaxis: [...xAxisAnnotations, nowAnnotation],
+        xaxis: [...xAxisAnnotations, ...kenteringAnnotations, nowAnnotation],
         yaxis: [
           {
             y: 20,
@@ -272,7 +298,7 @@ function StromingLineChart({ events }: Props) {
         text: 'Geen data beschikbaar.',
       },
     }),
-    [fullAxisBounds, nowAnnotation, points, xAxisAnnotations],
+    [fullAxisBounds, nowAnnotation, points, xAxisAnnotations, kenteringAnnotations],
   )
 
   const resetZoom = useCallback(() => {
