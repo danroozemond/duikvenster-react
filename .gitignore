@@ -29,3 +29,6 @@ dist-ssr
 *.tfstate.*
 *.tfplan
 .terraform.lock.hcl
+
+# Claude
+.claude/
