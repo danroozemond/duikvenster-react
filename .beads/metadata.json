@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_database": "duikvenster_react",
+  "project_id": "ff913888-189d-4446-91ad-3b9095a6ebb2"
+}
