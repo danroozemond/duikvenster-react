@@ -225,7 +225,7 @@ function StromingLineChart({ events, duikvensters }: Props) {
         ),
       )
     },
-    [defaultAxisBounds],
+    [defaultAxisBounds, fullAxisBounds],
   )
 
   const options = useMemo<ApexOptions>(
@@ -303,7 +303,7 @@ function StromingLineChart({ events, duikvensters }: Props) {
         text: 'Geen data beschikbaar.',
       },
     }),
-    [fullAxisBounds, nowAnnotation, points, xAxisAnnotations, kenteringAnnotations],
+    [fullAxisBounds, nowAnnotation, xAxisAnnotations, kenteringAnnotations, handleViewportChange],
   )
 
   const resetZoom = useCallback(() => {
@@ -317,7 +317,7 @@ function StromingLineChart({ events, duikvensters }: Props) {
       fullAxisBounds!.min,
       fullAxisBounds!.max,
     )
-  }, [fullAxisBounds])
+  }, [defaultAxisBounds, fullAxisBounds])
 
   return (
     <Suspense fallback={<p className="mb-0">Chart wordt geladen...</p>}>
