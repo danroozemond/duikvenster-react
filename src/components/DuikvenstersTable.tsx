@@ -38,6 +38,13 @@ function formatDateLocal(value: string): string {
 }
 
 function DuikvenstersTable({ duikvensters, badgeLabel }: Props) {
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000)
+    return () => clearInterval(id)
+  }, [])
+
   const processedRows = useMemo(
     () =>
       duikvensters.map((duikvenster, index) => {
@@ -46,10 +53,10 @@ function DuikvenstersTable({ duikvensters, badgeLabel }: Props) {
           duikvenster,
           index,
           dateLabel: formatDateLocal(duikvenster.van),
-          isPast: vanDate !== null && vanDate.getTime() < Date.now(),
+          isPast: vanDate !== null && vanDate.getTime() < now,
         }
       }),
-    [duikvensters],
+    [duikvensters, now],
   )
   const firstUpcomingIndex = processedRows.findIndex((row) => !row.isPast)
   const pastRowsAtTop =

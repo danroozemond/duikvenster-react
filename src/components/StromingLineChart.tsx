@@ -60,6 +60,7 @@ function isZoomedRange(
 function StromingLineChart({ events, duikvensters }: Props) {
   const [isZoomed, setIsZoomed] = useState(false)
   const [isChartMounted, setIsChartMounted] = useState(false)
+  const [now, setNow] = useState(() => Date.now())
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === 'undefined') {
       return false
@@ -67,6 +68,11 @@ function StromingLineChart({ events, duikvensters }: Props) {
 
     return window.matchMedia(MOBILE_MEDIA_QUERY).matches
   })
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000)
+    return () => clearInterval(id)
+  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -132,16 +138,15 @@ function StromingLineChart({ events, duikvensters }: Props) {
       return fullAxisBounds
     }
 
-    const nowMs = Date.now()
-    const min = nowMs - MOBILE_DEFAULT_PAST_WINDOW_MS
-    const max = nowMs + MOBILE_DEFAULT_FUTURE_WINDOW_MS
+    const min = now - MOBILE_DEFAULT_PAST_WINDOW_MS
+    const max = now + MOBILE_DEFAULT_FUTURE_WINDOW_MS
 
     return {
       min,
       max,
       tickAmount: Math.max(1, Math.floor((max - min) / SIX_HOURS_MS)),
     }
-  }, [fullAxisBounds, isMobile])
+  }, [fullAxisBounds, isMobile, now])
   const xAxisAnnotations = useMemo(
     () => buildSixHourAnnotations(timestamps),
     [timestamps],
@@ -172,7 +177,7 @@ function StromingLineChart({ events, duikvensters }: Props) {
   }, [duikvensters])
   const nowAnnotation = useMemo(
     () => ({
-      x: Date.now(),
+      x: now,
       borderColor: '#d9534f',
       borderWidth: 1,
       strokeDashArray: 4,
@@ -184,7 +189,7 @@ function StromingLineChart({ events, duikvensters }: Props) {
         },
       },
     }),
-    [defaultAxisBounds?.min, defaultAxisBounds?.max],
+    [now],
   )
 
   useEffect(() => {
