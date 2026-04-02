@@ -11,6 +11,9 @@ mixpanel.init('***REMOVED***', {
   api_host: 'https://api-eu.mixpanel.com',
 })
 
+mixpanel.identify(mixpanel.get_distinct_id())
+mixpanel.people.set_once({ 'First Seen': new Date().toISOString() })
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
