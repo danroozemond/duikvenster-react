@@ -11,6 +11,9 @@ mixpanel.init('f8a6ea3a609c46c5187b7d7ce76fcd91', {
   api_host: 'https://api-eu.mixpanel.com',
 })
 
+mixpanel.identify(mixpanel.get_distinct_id())
+mixpanel.people.set_once({ 'First Seen': new Date().toISOString() })
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
