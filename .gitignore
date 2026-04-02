@@ -30,6 +30,11 @@ dist-ssr
 *.tfplan
 .terraform.lock.hcl
 
+# Environment variables
+.env
+.env.*
+!.env.example
+
 # Claude
 .claude/
 

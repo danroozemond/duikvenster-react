@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import './styles/app.css'
 import App from './App.tsx'
 
-mixpanel.init('f8a6ea3a609c46c5187b7d7ce76fcd91', {
+mixpanel.init(import.meta.env.VITE_MIXPANEL_TOKEN as string, {
   autocapture: true,
   record_sessions_percent: 100,
   api_host: 'https://api-eu.mixpanel.com',
