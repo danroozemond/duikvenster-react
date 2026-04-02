@@ -1,5 +1,6 @@
 import Container from 'react-bootstrap/Container'
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState, useRef } from 'react'
+import mixpanel from 'mixpanel-browser'
 import AppNavbar from '../components/AppNavbar'
 import Infotext from '../components/Infotext'
 import DuikvenstersTable from '../components/DuikvenstersTable'
@@ -28,6 +29,22 @@ function HomePage() {
   const duikvensters = useMemo(() => getDuikvensters(stromingsdata ?? []), [stromingsdata])
   const [isLoadingStromingsdata, setIsLoadingStromingsdata] = useState(false)
   const [stromingsdataError, setStromingsdataError] = useState<string | null>(null)
+  const isMounted = useRef(false)
+
+  useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true
+      return
+    }
+    if (selectedSiteId === '') {
+      mixpanel.track('Dive Site Deselected')
+    } else {
+      mixpanel.track('Dive Site Selected', {
+        site_id: selectedSiteId,
+        site_name: diveSitesRecord[selectedSiteId],
+      })
+    }
+  }, [selectedSiteId])
 
   useEffect(() => {
     if (selectedSiteId === '') {
