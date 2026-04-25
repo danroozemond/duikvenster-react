@@ -20,6 +20,7 @@ function Infotext() {
       </p>
       <p className="mb-0">
         Duikvenster.nl is gemaakt door Dan Roozemond, die duikt bij <a href="https://delphinus.nl" target="_blank">Duikvereniging Delphinus</a> uit Eindhoven.
+          Bugs kun je melden op <a href="https://github.com/danroozemond/duikvenster-react/issues" target="_blank">GitHub</a>.
       </p>
     </>
   )
